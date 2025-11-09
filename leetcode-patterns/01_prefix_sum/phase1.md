@@ -137,6 +137,84 @@ class NumArray:
 
 ---
 
+## Problem: 1310. XOR Queries of a Subarray
+
+You are given an array `arr` of positive integers. You are also given the array `queries` where `queries[i] = [left_i, right_i]`.
+
+For each query `i` compute the **XOR** of elements from `left_i` to `right_i` (that is, `arr[left_i] XOR arr[left_i + 1] XOR ... XOR arr[right_i]` ).
+
+Return an array `answer` where `answer[i]` is the answer to the `ith` query.
+
+### Example 1
+
+```
+Input: arr = [1,3,4,8], queries = [[0,1],[1,2],[0,3],[3,3]]
+Output: [2,7,14,8]
+Explanation:
+The binary representation of the elements in the array are:
+1 = 0001
+3 = 0011
+4 = 0100
+8 = 1000
+The XOR values for queries are:
+[0,1] = 1 xor 3 = 2
+[1,2] = 3 xor 4 = 7
+[0,3] = 1 xor 3 xor 4 xor 8 = 14
+[3,3] = 8
+```
+
+### Example 2
+
+```
+Input: arr = [4,8,2,10], queries = [[2,3],[1,3],[0,0],[0,3]]
+Output: [8,0,4,4]
+```
+
+### Constraints
+
+- `1 <= arr.length, queries.length <= 3 \* 10^4`
+- `1 <= arr[i] <= 10^9`
+- `queries[i].length == 2`
+- `0 <= lefti <= righti < arr.length`
+
+### Solution
+
+**Logic:**
+
+This problem is a direct parallel to Problem 303 (Range Sum Query), but it uses the XOR operator instead of addition. The "Prefix Sum" technique can be adapted into a "**Prefix XOR**" array.
+
+The key property that makes this work is that XOR is its own inverse: `A ^ A = 0`.
+
+1. **Build Prefix XOR:** We create a prefix XOR array (the code does this in-place) where `arr[i] = arr[0] ^ arr[1] ^ ... ^ arr[i]`.
+
+2. Query Logic: The XOR of any subarray from `[left, right]` can be found in $O(1)$ time.
+
+- Let `prefix[i] = arr[0] ^ ... ^ arr[i]`.
+
+- We want `query(left, right) = arr[left] ^ ... ^ arr[right]`.
+
+- `prefix[right] = (arr[0] ^ ... ^ arr[left-1]) ^ (arr[left] ^ ... ^ arr[right])`
+
+- `prefix[left-1] = (arr[0] ^ ... ^ arr[left-1])`
+
+- If we XOR these two: `prefix[right] ^ prefix[left-1]`, the common prefix `(arr[0] ^ ... ^ arr[left-1])` cancels itself out, leaving just the desired range.
+
+3. Edge Case: The `code q[0] > 0` correctly handles the left = 0 case, where the answer is just `prefix[right]` (since there is no `prefix[left-1]` to XOR).
+
+**Code:**
+
+```python
+class Solution:
+    def xorQueries(self, arr: List[int], queries: List[List[int]]) -> List[int]:
+        for i in range(len(arr)):
+            arr[i] = arr[i] ^ arr[i-1] if i > 0 else arr[i]
+        res = []
+        for q in queries:
+            res.append(arr[q[1]] ^ arr[q[0]-1] if q[0] > 0 else arr[q[1]])
+
+        return res
+```
+
 ## Problem: 560. Subarray Sum Equals K
 
 Given an array of integers `nums` and an integer `k`, return the total number of subarrays whose sum equals to `k`.
@@ -196,11 +274,9 @@ This gives us a new algorithm:
 class Solution:
     def subarraySum(self, nums: List[int], k: int) -> int:
         prefix_sum, res = 0, 0
-        h_map = {}
+        h_map = {0:1}
         for num in nums:
             prefix_sum += num
-            if prefix_sum - k == 0:
-                res += 1
             if prefix_sum - k in h_map:
                 res += h_map[prefix_sum - k]
 
@@ -230,7 +306,7 @@ A **good subarray** is a subarray where:
 
 ---
 
-### Example 1:
+### Example 1
 
 ```
 Input: nums = [23,2,4,6,7], k = 6
@@ -238,7 +314,7 @@ Output: true
 Explanation: [2, 4] is a continuous subarray of size 2 whose elements sum up to 6.
 ```
 
-### Example 2:
+### Example 2
 
 ```
 Input: nums = [23,2,6,4,7], k = 6
@@ -247,7 +323,7 @@ Explanation: [23, 2, 6, 4, 7] is an continuous subarray of size 5 whose elements
 42 is a multiple of 6 because 42 = 7 * 6 and 7 is an integer.
 ```
 
-### Example 3:
+### Example 3
 
 ```
 Input: nums = [23,2,6,4,7], k = 13
@@ -312,15 +388,81 @@ class Solution:
 
 ```
 
----
+## Problem: 1248. Count Number of Nice Subarrays
+
+Given an array of integers `nums` and an integer `k`. A continuous subarray is called **nice** if there are `k` odd numbers on it.
+
+Return _the number of **nice** sub-arrays_.
+
+### Example 1
+
+```
+Input: nums = [1,1,2,1,1], k = 3
+Output: 2
+Explanation: The only sub-arrays with 3 odd numbers are [1,1,2,1] and [1,2,1,1].
+```
+
+### Example 2
+
+```
+Input: nums = [2,4,6], k = 1
+Output: 0
+Explanation: There are no odd numbers in the array.
+```
+
+### Example 3
+
+```
+Input: nums = [2,2,2,1,2,2,1,2,2,2], k = 2
+Output: 16
+```
+
+### Solution
+
+**Logic:**
+
+This problem is a clever disguise for the "Subarray Sum Equals K" pattern (Problem 560/930).
+
+1. **The Transformation:** The key insight is to transform the array. We don't care about the values of the numbers, only whether they are odd or even. The code does this transformation:
+
+- `odd number -> 1`
+- `even number -> 0`
+
+2. **The New Problem:** After this transformation, the original problem "find the number of subarrays with `k` odd numbers" becomes "find the number of subarrays with a `sum` of `k`."
+
+3. Standard Solution: We can now apply the standard 1D prefix sum + hash map algorithm for counting:
+
+- `presum` tracks the running prefix sum, which now represents the count of odd numbers seen so far.
+- The `h_map` stores the frequency of each `presum` count.
+- For each new `presum` at index `i`, we look for `presum - k` in the map. The value `h_map[presum - k]` tells us how many valid subarrays ending at index `i` have `k` odd numbers.
+- `h_map = {0: 1}` is the standard initialization to correctly count subarrays that start from the beginning of the array.
+
+**Code:**
+
+```python
+class Solution:
+    def numberOfSubarrays(self, nums: List[int], k: int) -> int:
+        presum, res = 0, 0
+        h_map = {0:1}
+
+        for i in range(len(nums)):
+            nums[i] = 0 if nums[i] % 2 == 0 else 1
+            presum += nums[i]
+            if presum - k in h_map:
+                res += h_map[presum - k]
+            if presum in h_map:
+                h_map[presum] += 1
+            else:
+                h_map[presum] = 1
+
+        return res
+```
 
 ## Problem: 974. Subarray Sums Divisible by K
 
 Given an integer array `nums` and an integer `k`, return the number of non-empty **subarrays** that have a sum divisible by `k`.
 
 A **subarray** is a **contiguous** part of an array.
-
----
 
 ### Example 1
 
