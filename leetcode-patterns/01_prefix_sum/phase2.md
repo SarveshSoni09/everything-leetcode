@@ -1,147 +1,10 @@
 # Pattern: Prefix Sum - Phase 2
 
-## Problem: 325. Maximum Size Subarray Sum Equals K
-
-Given an integer array `nums` and an integer `k`, return the maximum length of a **contiguous subarray** that sums to `k`. If no such subarray exists, return `0`.
-
----
-
-### Example 1
-
-```
-Input: nums = [1, -1, 5, -2, 3], k = 3
-Output: 4
-Explanation: The subarray [1, -1, 5, -2] sums to 3 and is the longest.
-```
-
-### Example 2
-
-```
-Input: nums = [-2, -1, 2, 1], k = 1
-Output: 2
-Explanation: The subarray [-1, 2] sums to 1 and is the longest.
-```
-
----
-
-### Constraints
-
-- `1 <= nums.length <= 2 * 10^5`
-- `-10^4 <= nums[i] <= 10^4`
-- `-10^9 <= k <= 10^9`
-
----
-
-### Solution
-
-**Logic:**
-
-This is the foundational "Prefix Sum + Hash Map" problem for finding **maximum length**.
-
-1.  We want to find `i` and `j` that maximize `j - i + 1` where `prefix_sum[j] - prefix_sum[i-1] = k`.
-2.  Rearranging gives: `prefix_sum[i-1] = prefix_sum[j] - k`.
-3.  We iterate with `j` (calling it `i` in the code), calculating the `prefix_sum`. The value we _need_ to find in the map is `target = prefix_sum - k`.
-4.  To get the **max length**, our map must store `{prefix_sum: first_seen_index}`. By only storing the _first_ (earliest) index, we guarantee that `i - h_map[target]` is the longest possible length.
-5.  We initialize `h_map = {0: -1}` to handle subarrays that start from index 0.
-
-**Code:**
-
-```python
-class Solution:
-    # Function name in LeetCode is maxSubArrayLen
-    def maxSubArrayLen(self, nums: List[int], k: int) -> int:
-        h_map = {0: -1}
-        prefix_sum, res = 0, 0
-        for i in range(len(nums)):
-            prefix_sum += nums[i]
-
-            target = prefix_sum - k
-            if target in h_map:
-                if i - h_map[target] > res:
-                    res = i - h_map[target]
-
-            # Only store the first occurrence to maximize length
-            if prefix_sum not in h_map:
-                h_map[prefix_sum] = i
-
-        return res
-```
-
----
-
-## Problem: 525. Contiguous Subarray
-
-Given a binary array `nums`, return the maximum length of a **contiguous subarray** with an equal number of `0` and `1`.
-
----
-
-### Example 1:
-
-```
-Input: nums = [0,1]
-Output: 2
-Explanation: [0, 1] is the longest contiguous subarray with an equal number of 0 and 1.
-```
-
-### Example 2:
-
-```
-Input: nums = [0,1,0]
-Output: 2
-Explanation: [0, 1] (or [1, 0]) is a longest contiguous subarray with equal number of 0 and 1.
-```
-
----
-
-### Constraints:
-
-- `1 <= nums.length <= 105`
-- `nums[i] is either 0 or 1.`
-
----
-
-### Solution
-
-**Logic:**
-
-This problem is a clever variation of **Problem 325**.
-
-1.  **The Variation:** We need equal 0s and 1s.
-2.  **The Extra Step:** We can transform this into a "sum" problem by **treating all `0`s as `-1`**.
-3.  **Why?** A subarray with an equal number of `1`s and `-1`s will have a sum of `0`.
-4.  **Result:** The problem is now "Find the maximum length subarray with sum `k = 0`." This is exactly **Problem 325** with `k=0`. The rest of the logic (using a map to store the _first_ index to maximize length) is identical.
-
-**Code:**
-
-```python
-class Solution:
-    def findMaxLength(self, nums: List[int]) -> int:
-        h_map = {0: -1}
-        prefix_sum, res = 0, 0
-        for i in range(len(nums)):
-            # Treat 0 as -1
-            prefix_sum += nums[i] if nums[i] == 1 else -1
-
-            if prefix_sum in h_map:
-                # If sum is seen, subarray from h_map[prefix_sum]+1 to i has sum 0
-                if i - h_map[prefix_sum] > res:
-                    res = i - h_map[prefix_sum]
-            else:
-                # Only store the first time we see a prefix_sum
-                h_map[prefix_sum] = i
-
-        return res
-```
-
----
-
 ## Problem: 930. Binary Subarray with Sum
 
 Given a binary array nums and an integer goal, return the **number** of non-empty subarrays with a sum goal.
 
 A subarray is a contiguous part of the array.
-
----
 
 ### Example 1:
 
@@ -162,8 +25,6 @@ Explanation: The 4 subarrays are bolded and underlined below:
 - `1 <= nums.length <= 3 * 10^4`
 - `nums[i] is either 0 or 1.`
 - `0 <= goal <= nums.length`
-
----
 
 ### Solution
 
@@ -203,36 +64,184 @@ class Solution:
         return res
 ```
 
----
+## Problem: 1248. Count Number of Nice Subarrays
 
-## Problem: 304. Range Sum Query 2D - Immutable
+Given an array of integers `nums` and an integer `k`. A continuous subarray is called **nice** if there are `k` odd numbers on it.
 
-Given a 2D matrix `matrix`, handle multiple queries of the following type:
+Return _the number of **nice** sub-arrays_.
 
-- Calculate the sum of the elements of `matrix` inside the rectangle defined by its **upper left corner** `(row1, col1)` and **lower right corner** `(row2, col2)`.
+### Example 1
 
-Implement the `NumMatrix` class for $O(1)$ query time.
+```
+Input: nums = [1,1,2,1,1], k = 3
+Output: 2
+Explanation: The only sub-arrays with 3 odd numbers are [1,1,2,1] and [1,2,1,1].
+```
 
----
+### Example 2
+
+```
+Input: nums = [2,4,6], k = 1
+Output: 0
+Explanation: There are no odd numbers in the array.
+```
+
+### Example 3
+
+```
+Input: nums = [2,2,2,1,2,2,1,2,2,2], k = 2
+Output: 16
+```
+
+### Solution
+
+**Logic:**
+
+This problem is a clever disguise for the "Subarray Sum Equals K" pattern (Problem 560/930).
+
+1. **The Transformation:** The key insight is to transform the array. We don't care about the values of the numbers, only whether they are odd or even. The code does this transformation:
+
+- `odd number -> 1`
+- `even number -> 0`
+
+2. **The New Problem:** After this transformation, the original problem "find the number of subarrays with `k` odd numbers" becomes "find the number of subarrays with a `sum` of `k`."
+
+3. Standard Solution: We can now apply the standard 1D prefix sum + hash map algorithm for counting:
+
+- `presum` tracks the running prefix sum, which now represents the count of odd numbers seen so far.
+- The `h_map` stores the frequency of each `presum` count.
+- For each new `presum` at index `i`, we look for `presum - k` in the map. The value `h_map[presum - k]` tells us how many valid subarrays ending at index `i` have `k` odd numbers.
+- `h_map = {0: 1}` is the standard initialization to correctly count subarrays that start from the beginning of the array.
+
+**Code:**
+
+```python
+class Solution:
+    def numberOfSubarrays(self, nums: List[int], k: int) -> int:
+        presum, res = 0, 0
+        h_map = {0:1}
+
+        for i in range(len(nums)):
+            nums[i] = 0 if nums[i] % 2 == 0 else 1
+            presum += nums[i]
+            if presum - k in h_map:
+                res += h_map[presum - k]
+            if presum in h_map:
+                h_map[presum] += 1
+            else:
+                h_map[presum] = 1
+
+        return res
+```
+
+## Problem: 525. Contiguous Subarray
+
+Given a binary array `nums`, return the maximum length of a **contiguous subarray** with an equal number of `0` and `1`.
 
 ### Example 1:
 
 ```
-Input
-["NumMatrix", "sumRegion", "sumRegion", "sumRegion"]
-[[[[3, 0, 1, 4, 2], [5, 6, 3, 2, 1], [1, 2, 0, 1, 5], [4, 1, 0, 1, 7], [1, 0, 3, 0, 5]]], [2, 1, 4, 3], [1, 1, 2, 2], [1, 2, 2, 4]]
-Output
-[null, 8, 11, 12]
+Input: nums = [0,1]
+Output: 2
+Explanation: [0, 1] is the longest contiguous subarray with an equal number of 0 and 1.
+```
+
+### Example 2:
+
+```
+Input: nums = [0,1,0]
+Output: 2
+Explanation: [0, 1] (or [1, 0]) is a longest contiguous subarray with equal number of 0 and 1.
 ```
 
 ---
 
 ### Constraints:
 
-- `1 <= m, n <= 200`
-- `0 <= row1 <= row2 < m`
-- `0 <= col1 <= col2 < n`
-- At most `104` calls will be made to `sumRegion`.
+- `1 <= nums.length <= 105`
+- `nums[i] is either 0 or 1.`
+
+### Solution
+
+**Logic:**
+
+This problem is a clever variation of **Problem 325**.
+
+1.  **The Variation:** We need equal 0s and 1s.
+2.  **The Extra Step:** We can transform this into a "sum" problem by **treating all `0`s as `-1`**.
+3.  **Why?** A subarray with an equal number of `1`s and `-1`s will have a sum of `0`.
+4.  **Result:** The problem is now "Find the maximum length subarray with sum `k = 0`." This is exactly **Problem 325** with `k=0`. The rest of the logic (using a map to store the _first_ index to maximize length) is identical.
+
+**Code:**
+
+```python
+class Solution:
+    def findMaxLength(self, nums: List[int]) -> int:
+        h_map = {0: -1}
+        prefix_sum, res = 0, 0
+        for i in range(len(nums)):
+            # Treat 0 as -1
+            prefix_sum += nums[i] if nums[i] == 1 else -1
+
+            if prefix_sum in h_map:
+                # If sum is seen, subarray from h_map[prefix_sum]+1 to i has sum 0
+                if i - h_map[prefix_sum] > res:
+                    res = i - h_map[prefix_sum]
+            else:
+                # Only store the first time we see a prefix_sum
+                h_map[prefix_sum] = i
+
+        return res
+```
+
+## Problem: 523. Continuous Subarray Sum
+
+Given an integer array `nums` and an integer `k`, return true if `nums` has a **good subarray** or `false` otherwise.
+
+A **good subarray** is a subarray where:
+
+- its length is at least two, and
+- the sum of the elements of the subarray is a multiple of k.
+
+**Note** that:
+
+- A **subarray** is a contiguous part of the array.
+- An integer `x` is a multiple of `k` if there exists an integer `n` such that `x = n * k`. `0` is always a multiple of `k`.
+
+---
+
+### Example 1
+
+```
+Input: nums = [23,2,4,6,7], k = 6
+Output: true
+Explanation: [2, 4] is a continuous subarray of size 2 whose elements sum up to 6.
+```
+
+### Example 2
+
+```
+Input: nums = [23,2,6,4,7], k = 6
+Output: true
+Explanation: [23, 2, 6, 4, 7] is an continuous subarray of size 5 whose elements sum up to 42.
+42 is a multiple of 6 because 42 = 7 * 6 and 7 is an integer.
+```
+
+### Example 3
+
+```
+Input: nums = [23,2,6,4,7], k = 13
+Output: false
+```
+
+---
+
+### Constraints:
+
+- `1 <= nums.length <= 10^5`
+- `0 <= nums[i] <= 10^9`
+- `0 <= sum(nums[i]) <= 2^31 - 1`
+- `1 <= k <= 2^31 - 1`
 
 ---
 
@@ -240,144 +249,121 @@ Output
 
 **Logic:**
 
-This problem extends the 1D prefix sum concept (like in `NumArray`) to 2D. It is _not_ related to the hash map pattern. The goal is to precompute a 2D prefix sum matrix in $O(M*N)$ to enable $O(1)$ queries.
+This problem adds a twist: we're looking for a sum that is a _multiple of k_, not equal to `k`.
 
-1.  **The Variation:** Prefix sum in 2D.
-2.  **The Extra Step:** We build a 2D matrix `prefix_mat` where `prefix_mat[r][c]` stores the sum of the rectangle from `(0, 0)` to `(r-1, c-1)`.
-3.  **Build Logic:** We use the **principle of inclusion-exclusion**. The sum for the rectangle ending at `[r][c]` is:
-    `Sum = matrix[r][c] + Sum_Above + Sum_Left - Sum_TopLeft`
-    `prefix_mat[r+1][c+1] = matrix[r][c] + prefix_mat[r][c+1] + prefix_mat[r+1][c] - prefix_mat[r][c]`
-4.  **Query Logic:** We use the same principle to "cut out" the desired rectangle. We use `+1` on `row2` and `col2`, and _not_ on `row1` and `col1`, because our `prefix_mat` is padded by 1.
-    `Sum = Total_Rect - Top_Rect - Left_Rect + TopLeft_Rect`
-    `ans = pm[r2+1][c2+1] - pm[r1][c2+1] - pm[r2+1][c1] + pm[r1][c1]`
+We want `sum(i, j) = n * k` for some integer `n`.
+Using prefix sums: `P[j] - P[i-1] = n * k`.
 
-**Code:**
+This equation means that `P[j]` and `P[i-1]` must have the **same remainder** when divided by `k`.
 
-```python
-class NumMatrix:
+- If `P[j] % k = rem`
 
-    def __init__(self, matrix: List[List[int]]):
-        m = len(matrix)
-        n = len(matrix[0])
-        # Create a (m+1) x (n+1) matrix to simplify edge cases
-        prefix_mat = [[0] * (n+1) for _ in range(m+1)]
+- And `P[i-1] % k = rem`
 
-        # Build the 2D prefix sum matrix
-        for row in range(m):
-            for col in range(n):
-                prefix_mat[row+1][col+1] = (
-                    matrix[row][col]
-                    + prefix_mat[row][col+1]   # Sum of region above
-                    + prefix_mat[row+1][col]   # Sum of region to the left
-                    - prefix_mat[row][col]     # Subtract top-left, which was added twice
-                )
-        self.prefix_mat = prefix_mat
+- Then `(P[j] - P[i-1]) % k = (rem - rem) % k = 0`. This proves their difference is a multiple of `k`.
 
-    def sumRegion(self, row1: int, col1: int, row2: int, col2: int) -> int:
-        pm = self.prefix_mat
+So, the algorithm changes:
 
-        # Use inclusion-exclusion to find the sum
-        ans = (
-            pm[row2+1][col2+1]  # The "total" rectangle from (0,0)
-            - pm[row1][col2+1]    # Subtract region above
-            - pm[row2+1][col1]    # Subtract region to the left
-            + pm[row1][col1]      # Add back top-left corner
-        )
-        return ans
-```
+1. The hash map now stores `{remainder: index}`. We only need to store the _first_ index where we see a remainder.
 
-## Problem: 1314. Matrix Block Sum
+2. We iterate, calculating `prefix_sum` and its `remainder = prefix_sum % k`.
 
-Given a `m x n` matrix `mat` and an integer `k`, return a matrix `answer` where each `answer[i][j]` is the sum of all elements `mat[r][c]` for:
+3. If we find `remainder` in `h_map`, it means we've seen it before at index `h_map[remainder]`. The subarray between `h_map[remainder] + 1` and `i` has a sum that is a multiple of `k`.
 
-- `i - k <= r <= i + k,`
-- `j - k <= c <= j + k,` and
-- `(r, c)` is a valid position in the matrix.
+4. We check if its length `i - h_map[remainder]` is at least 2. If it is, we return `True`.
 
-### Example 1
-
-```
-Input: mat = [[1,2,3],[4,5,6],[7,8,9]], k = 1
-Output: [[12,21,16],[27,45,33],[24,39,28]]
-```
-
-### Example 2
-
-```
-Input: mat = [[1,2,3],[4,5,6],[7,8,9]], k = 2
-Output: [[45,45,45],[45,45,45],[45,45,45]]
-```
-
-### Constraints
-
-- `m == mat.length`
-- `n == mat[i].length`
-- `1 <= m, n, k <= 100`
-- `1 <= mat[i][j] <= 100`
-
-### Solution
-
-**Logic:**
-
-This is a classic 2D prefix sum problem. A naive solution would calculate the sum for each cell `ans[r][c]` by iterating through its `(2k+1) x (2k+1)` block, which would be $O(m \cdot n \cdot k^2)$. We can do much better.
-
-The goal is to answer $O(mn)$ rectangle-sum queries efficiently.
-
-1. **Preprocessing:** First, precompute a 2D prefix sum matrix, `prefix_mat`, in $O(mn)$ time. We use a 1-indexed `(m+1) x (n+1)` matrix to simplify boundary lookups (the 0th row and 0th col are all zeros). `prefix_mat[r+1][c+1]` will store the sum of all elements from `mat[0][0]` to `mat[r][c]`.
-
-2. **Building `prefix_mat`:** The formula is the standard inclusion-exclusion principle:
-   `prefix_mat[r+1][c+1] = mat[r][c] + prefix_mat[r][c+1] + prefix_mat[r+1][c] - prefix_mat[r][c]`.
-
-3. **Answering Queries:** Create an `ans` matrix. Iterate through each cell `(r, c)` in the _original_ matrix.
-
-4. **Clamp Coordinates:** For each `(r, c)`, determine the _actual_ bounds of the subgrid. We must "clamp" the coordinates to stay within the matrix, as the block for cells near the edge will be smaller.
-
-   - Top-left corner `(r1, c1) = (max(0, r-K), max(0, c-K))`
-
-   - Bottom-right corner `(r2, c2) = (min(m-1, r+K), min(n-1, c+K))`
-
-5. **Query in** $O(1)$**:** Use the standard 2D prefix sum query (inclusion-exclusion) to find the sum of this `(r1, c1)` to `(r2, c2)` block in $O(1)$ time.
-
-   - The formula is: `sum = prefix_mat[r2+1][c2+1] - prefix_mat[r1][c2+1] - prefix_mat[r2+1][c1] + prefix_mat[r1][c1]`.
-
-   - This formula works perfectly even at the edges because of our 1-indexed `prefix_mat` (e.g., if `r1=0`, `prefix_mat[r1][...]` will correctly be `0`).
-
-6. **Assign Sum:** Set `ans[r][c] = sum` and return `ans`.
+5. The `h_map = {0: -1}` initialization is key. If `P[j]` itself is a multiple of `k`, its remainder is 0. We find `0` in the map, and the length is `i - (-1) = i + 1`. This correctly validates subarrays starting from index 0.
 
 **Code:**
 
 ```python
 class Solution:
-    def matrixBlockSum(self, mat: List[List[int]], K: int) -> List[List[int]]:
+    def checkSubarraySum(self, nums: List[int], k: int) -> bool:
+        h_map = {0: -1}
+        prefix_sum, res = 0, 0
+        for i in range(len(nums)):
+            prefix_sum += nums[i]
+            if prefix_sum % k in h_map:
+                if i - h_map[prefix_sum % k] >= 2:
+                    return True
+            else:
+                h_map[prefix_sum % k] = i
+        return False
 
-        m = len(mat)
-        n = len(mat[0])
-        prefix_mat = [[0] * (n+1) for _ in range(m+1)]
+```
 
-        for r in range(m):
-            for c in range(n):
-                prefix_mat[r+1][c+1] = (
-                    mat[r][c] +
-                    prefix_mat[r][c+1] +
-                    prefix_mat[r+1][c] -
-                    prefix_mat[r][c]
-                )
+## Problem: 974. Subarray Sums Divisible by K
 
-        ans = [[0] * n for _ in range(m)]
+Given an integer array `nums` and an integer `k`, return the number of non-empty **subarrays** that have a sum divisible by `k`.
 
-        for r in range(m):
-            for c in range(n):
-                r1 = max(0, r-K)
-                c1 = max(0, c-K)
-                r2 = min(m-1, r+K)
-                c2 = min(n-1, c+K)
+A **subarray** is a **contiguous** part of an array.
 
-                ans[r][c] = (
-                    prefix_mat[r2+1][c2+1]
-                    - prefix_mat[r1][c2+1]
-                    - prefix_mat[r2+1][c1]
-                    + prefix_mat[r1][c1]
-                )
+### Example 1
 
-        return ans
+```
+Input: nums = [4,5,0,-2,-3,1], k = 5
+Output: 7
+Explanation: There are 7 subarrays with a sum divisible by k = 5:
+[4, 5, 0, -2, -3, 1], [5], [5, 0], [5, 0, -2, -3], [0], [0, -2, -3], [-2, -3]
+```
+
+### Example 2
+
+```
+Input: nums = [5], k = 9
+Output: 0
+```
+
+---
+
+### Constraints
+
+```
+1 <= nums.length <= 3 * 10^4
+-10^4 <= nums[i] <= 10^4
+2 <= k <= 10^4
+```
+
+---
+
+### Solution
+
+**Logic:**
+
+This problem is the final synthesis. It combines the _counting_ logic from Problem 560 with the _modular arithmetic_ logic from Problem 523.
+
+- We need the **count** of subarrays, so our hash map must store **frequencies** (like 560): `{key: frequency}`.
+
+- We are looking for sums **divisible by k**, so the key to our map must be the **remainder** (like 523): `{remainder: frequency}`.
+
+The logic is:
+
+1. Initialize `h_map = {0: 1}` and `res = 0`. The `{0: 1}` entry is our "super-tool." It represents the empty prefix (sum 0, remainder 0) that occurred once.
+
+2. Iterate, calculating `pre_sum` and its `remainder`.
+
+3. When we get a new `remainder` (from `P[j]`), we ask, "How many times have we seen this _same remainder_ before?"
+
+4. The answer is `h_map[remainder]`. Every previous time we saw it (at an index `i-1`), it forms a valid pair `(i, j)` because `P[j] % k == P[i-1] % k`.
+
+5. We add this count to our result: `res += h_map[remainder]`.
+
+6. Then, we update the map with our current remainder: `h_map[remainder] = h_map.get(remainder, 0) + 1`.
+
+**Code:**
+
+```python
+class Solution:
+    def subarraysDivByK(self, nums: List[int], k: int) -> int:
+        h_map = {0: 1}
+        pre_sum, res = 0, 0
+        for num in nums:
+            pre_sum += num
+            if pre_sum % k in h_map:
+                res += h_map[pre_sum % k]
+                h_map[pre_sum % k] += 1
+            else:
+                h_map[pre_sum % k] = 1
+
+        return res
 ```
