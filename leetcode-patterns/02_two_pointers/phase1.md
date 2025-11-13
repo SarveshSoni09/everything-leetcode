@@ -271,3 +271,146 @@ class Solution:
         res.append(nums[i] ** 2)
         return res[::-1]
 ```
+
+## Problem: 344. Reverse String
+
+Write a function that reverses a string. The input string is given as an array of characters `s`.
+
+You must do this by modifying the input array in-place with `O(1)` extra memory.
+
+### Example 1
+
+```
+Input: s = ["h","e","l","l","o"]
+Output: ["o","l","l","e","h"]
+```
+
+### Example 2
+
+```
+Input: s = ["H","a","n","n","a","h"]
+Output: ["h","a","n","n","a","H"]
+```
+
+### Constraints
+
+- `1 <= s.length <= 10^5`
+- `s[i]` is a printable ascii character.
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def reverseString(self, s: List[str]) -> None:
+        """
+        Do not return anything, modify s in-place instead.
+        """
+        l, r = 0, len(s)-1
+        while l<r:
+            s[l], s[r] = s[r], s[l]
+            l += 1
+            r -= 1
+```
+
+## Problem: 345. Reverse Vowels of a String
+
+Given a string `s`, reverse only all the vowels in the string and return it.
+
+The vowels are `'a'`, `'e'`, `'i'`, `'o'`, and `'u'`, and they can appear in both lower and upper cases, more than once.
+
+### Example 1
+
+```
+Input: s = "IceCreAm"
+Output: "AceCreIm"
+Explanation:
+The vowels in s are ['I', 'e', 'e', 'A']. On reversing the vowels, s becomes "AceCreIm".
+```
+
+### Example 2
+
+```
+Input: s = "leetcode"
+Output: "leotcede"
+```
+
+### Constraints
+
+- `1 <= s.length <= 3 * 10^5`
+- `s` consist of printable ASCII characters.
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def reverseVowels(self, s: str) -> str:
+        s = list(s)
+        print(s)
+        l, r = 0, len(s) - 1
+        vowels = "aeiouAEIOU"
+        while l < r:
+            while s[l] not in vowels and l < r:
+                print(l)
+                l += 1
+            while s[r] not in vowels and l < r:
+                r -= 1
+            s[l], s[r] = s[r], s[l]
+            l += 1
+            r -= 1
+        return "".join(s)
+```
+
+## Problem: 905. Sort Array By Parity
+
+Given an integer array `nums`, move all the even integers at the beginning of the array followed by all the odd integers.
+
+Return any array that satisfies this condition.
+
+### Example 1
+
+```
+Input: nums = [3,1,2,4]
+Output: [2,4,3,1]
+Explanation: The outputs [4,2,3,1], [2,4,1,3], and [4,2,1,3] would also be accepted.
+```
+
+### Example 2
+
+```
+Input: nums = [0]
+Output: [0]
+```
+
+### Constraints
+
+- `1 <= nums.length <= 5000`
+- `0 <= nums[i] <= 5000`
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def sortArrayByParity(self, nums: List[int]) -> List[int]:
+        l, r = 0, len(nums) - 1
+        while l < r:
+            while nums[l] % 2 == 0 and l < r:
+                l += 1
+            while nums[r] % 2 == 1 and l < r:
+                r -= 1
+            nums[l], nums[r] = nums[r], nums[l]
+            l += 1
+            r -= 1
+        return nums
+```
