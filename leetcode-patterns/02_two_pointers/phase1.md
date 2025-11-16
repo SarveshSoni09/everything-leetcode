@@ -46,6 +46,27 @@ Explanation: The sum of -1 and 0 is -1. Therefore index1 = 1, index2 = 2. We ret
 
 **Logic:**
 
+This is the foundational two-pointer problem that demonstrates the core pattern. The key insight is that because the array is **sorted**, we can use two pointers starting from opposite ends to efficiently find the target sum.
+
+1. **Initial Setup:** Place one pointer `i` at the start (index 0) and another pointer `j` at the end (index `len(numbers)-1`).
+
+2. **The Two-Pointer Strategy:** At each step, we compare `numbers[i] + numbers[j]` with `target`:
+
+   - If the sum equals `target`, we've found our answer.
+   - If the sum is **less than** `target`, we need a larger sum. Since the array is sorted, moving `i` to the right (incrementing) will give us a larger value.
+   - If the sum is **greater than** `target`, we need a smaller sum. Moving `j` to the left (decrementing) will give us a smaller value.
+
+3. **Why This Works:** The sorted property guarantees that:
+
+   - All elements to the left of `i` are smaller than `numbers[i]`
+   - All elements to the right of `j` are larger than `numbers[j]`
+   - This allows us to make greedy decisions about which pointer to move, eliminating half the search space at each step.
+
+4. **Time Complexity:** O(N) - each element is visited at most once.
+5. **Space Complexity:** O(1) - only two pointers are used.
+
+This problem establishes the fundamental two-pointer technique: **start from opposite ends and move pointers based on comparison with a target value**.
+
 **Code:**
 
 ```python
@@ -101,6 +122,26 @@ Since an empty string reads the same forward and backward, it is a palindrome.
 
 **Logic:**
 
+This problem introduces the two-pointer technique for **string validation**. The core idea is to compare characters from both ends, moving inward until the pointers meet.
+
+1. **Preprocessing:** First, we normalize the string by converting to lowercase and removing non-alphanumeric characters. This creates a clean string that only contains the characters we care about.
+
+2. **Two-Pointer Approach:**
+
+   - Place `i` at the start (index 0) and `j` at the end (index `len(s)-1`).
+   - While `i < j`, compare `s[i]` and `s[j]`.
+   - If they don't match, return `False` immediately.
+   - If they match, move both pointers inward: `i += 1` and `j -= 1`.
+
+3. **Termination:** The loop continues until `i >= j`, meaning we've checked all pairs. If we exit the loop without finding a mismatch, the string is a palindrome.
+
+4. **Key Insight:** This problem demonstrates that two pointers can work on strings just as effectively as arrays. The pattern of "compare from both ends and move inward" is a fundamental two-pointer technique.
+
+5. **Time Complexity:** O(N) - we process each character at most once.
+6. **Space Complexity:** O(N) - we create a new string with only alphanumeric characters.
+
+This problem builds on the two-pointer concept from Problem 167, but applies it to **character-by-character comparison** rather than sum calculation.
+
 **Code:**
 
 ```python
@@ -117,111 +158,69 @@ class Solution:
         return True
 ```
 
-## Problem: 680. Valid Palindrome II
+## Problem: 344. Reverse String
 
-Given a string `s`, return `true` if the `s` can be palindrome after deleting at most one character from it.
+Write a function that reverses a string. The input string is given as an array of characters `s`.
+
+You must do this by modifying the input array in-place with `O(1)` extra memory.
 
 ### Example 1
 
 ```
-Input: s = "aba"
-Output: true
+Input: s = ["h","e","l","l","o"]
+Output: ["o","l","l","e","h"]
 ```
 
 ### Example 2
 
 ```
-Input: s = "abca"
-Output: true
-Explanation: You could delete the character 'c'.
-```
-
-### Example 3
-
-```
-Input: s = "abc"
-Output: false
+Input: s = ["H","a","n","n","a","h"]
+Output: ["h","a","n","n","a","H"]
 ```
 
 ### Constraints
 
-- `1 <= s.length <= 105`
-- `s` consists of lowercase English letters.
+- `1 <= s.length <= 10^5`
+- `s[i]` is a printable ascii character.
 
 ### Solution
 
 **Logic:**
 
-**Code:**
+This problem demonstrates the two-pointer technique for **in-place array manipulation**. It's one of the simplest applications of swapping elements from opposite ends.
 
-```python
-class Solution:
-    def validPalindrome(self, s: str) -> bool:
-        def check(i, j):
-            while i < j:
-                if s[i] != s[j]:
-                    return False
-                i += 1
-                j -= 1
-            return True
+1. **Two-Pointer Setup:** Place `l` at the start (index 0) and `r` at the end (index `len(s)-1`).
 
-        i, j = 0, len(s) - 1
-        while i < j:
-            if s[i] != s[j]:
-                return check(i+1, j) or check(i, j-1)
-            i += 1
-            j -= 1
-        return True
-```
+2. **Swapping Strategy:**
 
-## Problem: 11. Container with Most Water
+   - While `l < r`, swap `s[l]` and `s[r]`.
+   - Move `l` right: `l += 1`
+   - Move `r` left: `r -= 1`
 
-You are given an integer array `height` of length `n`. There are `n` vertical lines drawn such that the two endpoints of the `ith` line are `(i, 0)` and `(i, height[i])`.
+3. **Why This Works:** By swapping elements from opposite ends and moving inward, we effectively reverse the entire array. The first element becomes the last, the second becomes the second-to-last, and so on.
 
-Find two lines that together with the x-axis form a container, such that the container contains the most water.
+4. **Termination:** When `l >= r`, we've swapped all necessary pairs. If the array has an odd length, the middle element stays in place (which is correct).
 
-Return the maximum amount of water a container can store.
+5. **Key Insight:** This problem shows that two pointers can be used for **element swapping**, not just comparison. The pattern of "swap and move inward" is fundamental to many in-place algorithms.
 
-### Example 1
+6. **Time Complexity:** O(N) - we swap N/2 pairs.
+7. **Space Complexity:** O(1) - only two pointers are used, no extra space.
 
-```
-Input: height = [1,8,6,2,5,4,8,3,7]
-Output: 49
-Explanation: The above vertical lines are represented by array [1,8,6,2,5,4,8,3,7]. In this case, the max area of water (blue section) the container can contain is 49.
-```
-
-### Example 2
-
-```
-Input: height = [1,1]
-Output: 1
-```
-
-### Constraints
-
-- `n == height.length`
-- `2 <= n <= 10^5`
-- `0 <= height[i] <= 10^4`
-
-### Solution
-
-**Logic:**
+This problem builds on the two-pointer concept by introducing **element swapping** as a core operation, which will be used in more complex problems later.
 
 **Code:**
 
 ```python
 class Solution:
-    def maxArea(self, height: List[int]) -> int:
-        i, j = 0, len(height) - 1
-        res = 0
-        while i < j:
-            area = min(height[i], height[j]) * (j-i)
-            res = max(res, area)
-            if height[i] < height[j]:
-                i += 1
-            else:
-                j -= 1
-        return res
+    def reverseString(self, s: List[str]) -> None:
+        """
+        Do not return anything, modify s in-place instead.
+        """
+        l, r = 0, len(s)-1
+        while l<r:
+            s[l], s[r] = s[r], s[l]
+            l += 1
+            r -= 1
 ```
 
 ## Problem: 977. Squares of a Sorted Array
@@ -254,6 +253,30 @@ Output: [4,9,9,49,121]
 
 **Logic:**
 
+This problem introduces a key insight: when dealing with **squares** of a sorted array containing negative numbers, the largest squares come from the **extremes** (most negative or most positive), not necessarily from the ends in order.
+
+1. **The Challenge:** After squaring, `[-4, -1, 0, 3, 10]` becomes `[16, 1, 0, 9, 100]`. The largest square (16) comes from the most negative number (-4), not from the end of the original array.
+
+2. **Two-Pointer Strategy:**
+
+   - Start with `i` at the beginning and `j` at the end.
+   - Compare the **absolute values** of `nums[i]` and `nums[j]`.
+   - The one with the larger absolute value will produce the larger square.
+   - Place the larger square at the **end** of the result array (since we're building it in reverse order).
+   - Move the pointer that contributed the larger square.
+
+3. **Building the Result:**
+
+   - We build the result array from right to left (largest to smallest).
+   - After processing all elements, we reverse the result array to get the correct order.
+
+4. **Why This Works:** The key insight is that in a sorted array with negatives, the largest squares are at the extremes. By comparing absolute values and always taking the larger one, we can build the sorted squares array in one pass.
+
+5. **Time Complexity:** O(N) - each element is processed exactly once.
+6. **Space Complexity:** O(N) - for the result array.
+
+This problem demonstrates that two pointers can be used to **merge or combine** elements from opposite ends, building a result array in a specific order. This concept will be extended in more complex problems.
+
 **Code:**
 
 ```python
@@ -270,50 +293,6 @@ class Solution:
                 j -= 1
         res.append(nums[i] ** 2)
         return res[::-1]
-```
-
-## Problem: 344. Reverse String
-
-Write a function that reverses a string. The input string is given as an array of characters `s`.
-
-You must do this by modifying the input array in-place with `O(1)` extra memory.
-
-### Example 1
-
-```
-Input: s = ["h","e","l","l","o"]
-Output: ["o","l","l","e","h"]
-```
-
-### Example 2
-
-```
-Input: s = ["H","a","n","n","a","h"]
-Output: ["h","a","n","n","a","H"]
-```
-
-### Constraints
-
-- `1 <= s.length <= 10^5`
-- `s[i]` is a printable ascii character.
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def reverseString(self, s: List[str]) -> None:
-        """
-        Do not return anything, modify s in-place instead.
-        """
-        l, r = 0, len(s)-1
-        while l<r:
-            s[l], s[r] = s[r], s[l]
-            l += 1
-            r -= 1
 ```
 
 ## Problem: 345. Reverse Vowels of a String
@@ -347,18 +326,40 @@ Output: "leotcede"
 
 **Logic:**
 
+This problem combines the **swapping** technique from Problem 344 with **conditional pointer movement** based on character properties. It introduces the concept of "skip non-target elements" while maintaining the two-pointer approach.
+
+1. **The Challenge:** We need to reverse only vowels while keeping consonants in their original positions. This requires finding vowels from both ends and swapping them.
+
+2. **Two-Pointer with Conditional Movement:**
+
+   - Start with `l` at the beginning and `r` at the end.
+   - **Skip non-vowels:** While `s[l]` is not a vowel and `l < r`, increment `l`. Similarly, while `s[r]` is not a vowel and `l < r`, decrement `r`.
+   - Once both pointers are on vowels, swap them.
+   - Move both pointers inward: `l += 1` and `r -= 1`.
+
+3. **Key Insight:** This problem introduces the pattern of **conditional pointer advancement**. Instead of always moving both pointers, we move them only when they're pointing to the elements we care about (vowels in this case).
+
+4. **Why This Works:** By skipping non-vowels, we ensure that:
+
+   - Consonants stay in their original positions
+   - Only vowels get swapped with each other
+   - The relative order of vowels is reversed
+
+5. **Time Complexity:** O(N) - each character is visited at most once.
+6. **Space Complexity:** O(N) - we convert the string to a list for in-place modification.
+
+This problem builds on Problem 344 (swapping) and Problem 125 (character checking), combining them to create a **selective swapping** algorithm. This pattern of "find target elements from both ends and swap" will be used in more complex problems like Problem 905.
+
 **Code:**
 
 ```python
 class Solution:
     def reverseVowels(self, s: str) -> str:
         s = list(s)
-        print(s)
         l, r = 0, len(s) - 1
         vowels = "aeiouAEIOU"
         while l < r:
             while s[l] not in vowels and l < r:
-                print(l)
                 l += 1
             while s[r] not in vowels and l < r:
                 r -= 1
@@ -366,458 +367,4 @@ class Solution:
             l += 1
             r -= 1
         return "".join(s)
-```
-
-## Problem: 905. Sort Array By Parity
-
-Given an integer array `nums`, move all the even integers at the beginning of the array followed by all the odd integers.
-
-Return any array that satisfies this condition.
-
-### Example 1
-
-```
-Input: nums = [3,1,2,4]
-Output: [2,4,3,1]
-Explanation: The outputs [4,2,3,1], [2,4,1,3], and [4,2,1,3] would also be accepted.
-```
-
-### Example 2
-
-```
-Input: nums = [0]
-Output: [0]
-```
-
-### Constraints
-
-- `1 <= nums.length <= 5000`
-- `0 <= nums[i] <= 5000`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def sortArrayByParity(self, nums: List[int]) -> List[int]:
-        l, r = 0, len(nums) - 1
-        while l < r:
-            while nums[l] % 2 == 0 and l < r:
-                l += 1
-            while nums[r] % 2 == 1 and l < r:
-                r -= 1
-            nums[l], nums[r] = nums[r], nums[l]
-            l += 1
-            r -= 1
-        return nums
-```
-
-## Problem: 75. Sort Colors
-
-Given an array `nums` with `n` objects colored red, white, or blue, sort them in-place so that objects of the same color are adjacent, with the colors in the order red, white, and blue.
-
-We will use the integers `0`, `1`, and `2` to represent the color red, white, and blue, respectively.
-
-You must solve this problem without using the library's sort function.
-
-### Example 1
-
-```
-Input: nums = [2,0,2,1,1,0]
-Output: [0,0,1,1,2,2]
-```
-
-### Example 2
-
-```
-Input: nums = [2,0,1]
-Output: [0,1,2]
-```
-
-### Constraints
-
-- `n == nums.length`
-- `1 <= n <= 300`
-- `nums[i]` is either 0, 1, or 2.
-
-Follow up: Could you come up with a one-pass algorithm using only constant extra space?
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def sortColors(self, nums: List[int]) -> None:
-        """
-        Do not return anything, modify nums in-place instead.
-        """
-        i, l, r = 0, 0, len(nums) - 1
-        while i <= r:
-            if nums[i] == 2:
-                nums[i], nums[r] = nums[r], nums[i]
-                r -= 1
-            elif nums[i] == 0:
-                nums[i], nums[l] = nums[l], nums[i]
-                l += 1
-                i += 1
-            else:
-                i += 1
-```
-
-## Problem: 15. 3Sum
-
-Given an integer array `nums`, return all the triplets `[nums[i], nums[j], nums[k]]` such that `i != j`, `i != k`, and `j != k`, and `nums[i] + nums[j] + nums[k] == 0`.
-
-Notice that the solution set must not contain duplicate triplets.
-
-### Example 1
-
-```
-Input: nums = [-1,0,1,2,-1,-4]
-Output: [[-1,-1,2],[-1,0,1]]
-Explanation:
-nums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0.
-nums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0.
-nums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0.
-The distinct triplets are [-1,0,1] and [-1,-1,2].
-Notice that the order of the output and the order of the triplets does not matter.
-```
-
-### Example 2
-
-```
-Input: nums = [0,1,1]
-Output: []
-Explanation: The only possible triplet does not sum up to 0.
-```
-
-### Example 3
-
-```
-Input: nums = [0,0,0]
-Output: [[0,0,0]]
-Explanation: The only possible triplet sums up to 0.
-```
-
-### Constraints
-
-- `3 <= nums.length <= 3000`
-- `-10^5 <= nums[i] <= 10^5`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def threeSum(self, nums: List[int]) -> List[List[int]]:
-        res = []
-        nums.sort()
-
-        for i, num in enumerate(nums):
-            if i > 0 and num == nums[i-1]:
-                continue
-
-            l, r = i+1, len(nums)-1
-            while l<r:
-                threesum = num + nums[l] + nums[r]
-                if threesum > 0:
-                    r -= 1
-                elif threesum < 0:
-                    l += 1
-                else:
-                    res.append([num, nums[l], nums[r]])
-                    l += 1
-                    while l<r and nums[l] == nums[l-1]:
-                        l+=1
-        return res
-```
-
-## Problem: 16. 3Sum Closest
-
-Given an integer array `nums` of length `n` and an integer `target`, find three integers in nums such that the sum is closest to target.
-
-Return the sum of the three integers.
-
-You may assume that each input would have exactly one solution.
-
-### Example 1
-
-```
-Input: nums = [-1,2,1,-4], target = 1
-Output: 2
-Explanation: The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
-```
-
-### Example 2
-
-```
-Input: nums = [0,0,0], target = 1
-Output: 0
-Explanation: The sum that is closest to the target is 0. (0 + 0 + 0 = 0).
-```
-
-### Constraints
-
-- `3 <= nums.length <= 500`
-- `-1000 <= nums[i] <= 1000`
-- `-10^4 <= target <= 10^4`
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def threeSumClosest(self, nums: List[int], target: int) -> int:
-        res = float('inf')
-        nums.sort()
-        for i, num in enumerate(nums):
-            l, r = i + 1, len(nums) - 1
-            while l < r:
-                curr_sum = num + nums[l] + nums[r]
-                diff = target - curr_sum
-                if abs(diff) < abs(res):
-                    res = diff
-                if diff < 0:
-                    r -= 1
-                else:
-                    l += 1
-        return target - res
-```
-
-## Problem: 18. 4Sum
-
-Given an array `nums` of `n` integers, return an array of all the unique quadruplets `[nums[a], nums[b], nums[c], nums[d]]` such that:
-
-- `0 <= a, b, c, d < n`
-- `a`, `b`, `c`, and `d` are distinct.
-- `nums[a] + nums[b] + nums[c] + nums[d] == target`
-- You may return the answer in any order.
-
-### Example 1
-
-```
-Input: nums = [1,0,-1,0,-2,2], target = 0
-Output: [[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]
-```
-
-### Example 2
-
-```
-Input: nums = [2,2,2,2,2], target = 8
-Output: [[2,2,2,2]]
-```
-
-### Constraints
-
-- `1 <= nums.length <= 200`
-- `-10^9 <= nums[i] <= 10^9`
-- `-10^9 <= target <= 10^9`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
-        nums.sort()
-        n = len(nums)
-        res = []
-        for i in range(n - 3):
-            if i > 0 and nums[i] == nums[i-1]:
-                continue
-            for j in range(i+1, n - 2):
-                if j > i+1 and nums[j] == nums[j-1]:
-                    continue
-                l, r = j + 1, n - 1
-                while l < r:
-                    curr_sum = nums[i] + nums[j] + nums[l] + nums[r]
-                    if curr_sum - target == 0 and [nums[i], nums[j], nums[l], nums[r]] not in res:
-                        res.append([nums[i], nums[j], nums[l], nums[r]] )
-                        while l < r and nums[l] == nums[l+1]:
-                            l += 1
-                        while l < r and nums[r] == nums[r-1]:
-                            r -= 1
-                        l += 1
-                        r -= 1
-                    elif curr_sum > target:
-                        r -= 1
-                    else:
-                        l += 1
-        return res
-```
-
-## Problem: 633. Sum of Square Numbers
-
-Given a non-negative integer `c`, decide whether there're two integers `a` and `b` such that `a2 + b2 = c`.
-
-### Example 1
-
-```
-Input: c = 5
-Output: true
-Explanation: 1 * 1 + 2 * 2 = 5
-```
-
-### Example 2
-
-```
-Input: c = 3
-Output: false
-```
-
-### Constraints
-
-- `0 <= c <= 2^31 - 1`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-import math
-
-class Solution:
-    def judgeSquareSum(self, c: int) -> bool:
-        c_root = math.sqrt(c)
-        l, r = 1, math.floor(c_root)
-        half_root = math.sqrt(c/2)
-        if c_root == r or half_root == math.floor(half_root):
-            return True
-
-        while l < r:
-            sq_sum = l ** 2 + r ** 2
-            if sq_sum == c:
-                return True
-            elif sq_sum > c:
-                r -= 1
-            else:
-                l += 1
-        return False
-```
-
-## Problem: 881. Boats to Save People
-
-You are given an array `people` where `people[i]` is the weight of the `ith` person, and an infinite number of boats where each boat can carry a maximum weight of `limit`. Each boat carries at most two people at the same time, provided the sum of the weight of those people is at most `limit`.
-
-Return the minimum number of boats to carry every given person.
-
-### Example 1
-
-```
-Input: people = [1,2], limit = 3
-Output: 1
-Explanation: 1 boat (1, 2)
-```
-
-### Example 2
-
-```
-Input: people = [3,2,2,1], limit = 3
-Output: 3
-Explanation: 3 boats (1, 2), (2) and (3)
-```
-
-### Example 3
-
-```
-Input: people = [3,5,3,4], limit = 5
-Output: 4
-Explanation: 4 boats (3), (3), (4), (5)
-```
-
-### Constraints
-
-- `1 <= people.length <= 5 * 10^4`
-- `1 <= people[i] <= limit <= 3 * 10^4`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def numRescueBoats(self, people: List[int], limit: int) -> int:
-        people.sort()
-        l, r = 0, len(people) - 1
-        res = 0
-        while l < r:
-            if people[l] + people[r] > limit:
-                res += 1
-                r -= 1
-            else:
-                res += 1
-                l += 1
-                r -= 1
-        if l == r:
-            return res + 1
-        return res
-```
-
-## Problem: 42. Trapping Rain Water
-
-Given `n` non-negative integers representing an elevation map where the width of each bar is `1`, compute how much water it can trap after raining.
-
-### Example 1
-
-```
-Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]
-Output: 6
-       0
-   01110010
- 01001000000
-Explanation: The above elevation map zeros is represented by array [0,1,0,2,1,0,1,3,2,1,2,1]. In this case, 6 units of rain water ones are being trapped.
-```
-
-### Example 2
-
-```
-Input: height = [4,2,0,3,2,5]
-Output: 9
-```
-
-### Constraints
-
-- `n == height.length`
-- `1 <= n <= 2 * 10^4`
-- `0 <= height[i] <= 10^5`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def trap(self, height: List[int]) -> int:
-        l, r = 0, len(height)-1
-        l_max, r_max = height[l], height[r]
-        water = 0
-        while l < r:
-            if l_max <= r_max:
-                l += 1
-                l_max = max(l_max, height[l])
-                water += l_max - height[l]
-            else:
-                r -= 1
-                r_max = max(r_max, height[r])
-                water += r_max - height[r]
-        return water
 ```
