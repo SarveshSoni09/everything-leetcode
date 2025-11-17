@@ -220,3 +220,65 @@ class Solution:
                 return True
         return False
 ```
+
+## Problem: 438. Find All Anagrams in a String
+
+Given two strings `s` and `p`, return an array of all the start indices of `p`'s anagrams in `s`. You may return the answer in any order.
+
+### Example 1
+
+```
+Input: s = "cbaebabacd", p = "abc"
+Output: [0,6]
+Explanation:
+The substring with start index = 0 is "cba", which is an anagram of "abc".
+The substring with start index = 6 is "bac", which is an anagram of "abc".
+```
+
+### Example 2
+
+```
+Input: s = "abab", p = "ab"
+Output: [0,1,2]
+Explanation:
+The substring with start index = 0 is "ab", which is an anagram of "ab".
+The substring with start index = 1 is "ba", which is an anagram of "ab".
+The substring with start index = 2 is "ab", which is an anagram of "ab".
+```
+
+### Constraints
+
+- `1 <= s.length, p.length <= 3 * 10^4`
+- `s` and `p` consist of lowercase English letters.
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def findAnagrams(self, s: str, p: str) -> List[int]:
+        if len(s) < len(p):
+            return []
+        n = len(p)
+        check_p, check_s = {}, {}
+        res = []
+        for c in p:
+            check_p[c] = check_p.get(c, 0) + 1
+            check_s[c] = 0
+        for i in range(n):
+            if s[i] in check_s:
+                check_s[s[i]] += 1
+        if check_p == check_s:
+            res.append(0)
+        for i in range(n, len(s)):
+            if s[i] in check_s:
+                check_s[s[i]] += 1
+            if s[i-n] in check_s:
+                check_s[s[i-n]] -= 1
+            if check_p == check_s:
+                res.append(i-n+1)
+        return res
+```
