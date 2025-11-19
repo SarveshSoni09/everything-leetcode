@@ -389,7 +389,7 @@ class Solution:
         return res if res != float('inf') else 0
 ```
 
-### Problem: 3. Longest Substring Without Repeating Characters
+## Problem: 3. Longest Substring Without Repeating Characters
 
 Given a string `s`, find the length of the longest substring without duplicate characters.
 
@@ -494,5 +494,189 @@ class Solution:
                 else:
                     zeros += 1
             res = max(res, r-l+1)
+        return res
+```
+
+## Problem: 424. Longest Repeating Character Replacement
+
+You are given a string `s` and an integer `k`. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most `k` times.
+
+Return the length of the longest substring containing the same letter you can get after performing the above operations.
+
+### Example 1
+
+```
+Input: s = "ABAB", k = 2
+Output: 4
+Explanation: Replace the two 'A's with two 'B's or vice versa.
+```
+
+### Example 2
+
+```
+Input: s = "AABABBA", k = 1
+Output: 4
+Explanation: Replace the one 'A' in the middle with 'B' and form "AABBBBA".
+The substring "BBBB" has the longest repeating letters, which is 4.
+There may exists other ways to achieve this answer too.
+```
+
+### Constraints
+
+- `1 <= s.length <= 10^5`
+- `s` consists of only uppercase English letters.
+- `0 <= k <= s.length`
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def characterReplacement(self, s: str, k: int) -> int:
+        count = {}
+        l, res = 0, 0
+        for r in range(len(s)):
+            count[s[r]] = 1 + count.get(s[r], 0)
+            while (r - l + 1) - max(count.values()) > k:
+                count[s[l]] -= 1
+                l += 1
+            res = max(res, r - l + 1)
+        return res
+```
+
+## Problem: 904. Fruit into Baskets
+
+You are visiting a farm that has a single row of fruit trees arranged from left to right. The trees are represented by an integer array `fruits` where `fruits[i]` is the type of fruit the `ith` tree produces.
+
+You want to collect as much fruit as possible. However, the owner has some strict rules that you must follow:
+
+- You only have two baskets, and each basket can only hold a single type of fruit. There is no limit on the amount of fruit each basket can hold.
+- Starting from any tree of your choice, you must pick exactly one fruit from every tree (including the start tree) while moving to the right. The picked fruits must fit in one of your baskets.
+- Once you reach a tree with fruit that cannot fit in your baskets, you must stop.
+
+Given the integer array `fruits`, return the maximum number of fruits you can pick.
+
+### Example 1
+
+```
+Input: fruits = [1,2,1]
+Output: 3
+Explanation: We can pick from all 3 trees.
+```
+
+### Example 2
+
+```
+Input: fruits = [0,1,2,2]
+Output: 3
+Explanation: We can pick from trees [1,2,2].
+If we had started at the first tree, we would only pick from trees [0,1].
+```
+
+### Example 3
+
+```
+Input: fruits = [1,2,3,2,2]
+Output: 4
+Explanation: We can pick from trees [2,3,2,2].
+If we had started at the first tree, we would only pick from trees [1,2].
+```
+
+### Constraints
+
+- `1 <= fruits.length <= 10^5`
+- `0 <= fruits[i] < fruits.length`
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def totalFruit(self, fruits: List[int]) -> int:
+        check = {}
+        l, res = 0, 0
+        for r in range(len(fruits)):
+            check[fruits[r]] = check.get(fruits[r], 0) + 1
+            if len(check) > 2:
+                check[fruits[l]] -= 1
+                if check[fruits[l]] == 0:
+                    check.pop(fruits[l])
+                l += 1
+            res = max(res, r - l + 1)
+        return res
+```
+
+OR the below solution which optimizes time complexity but increases space complexity
+
+```python
+class Solution:
+    def totalFruit(self, fruits: List[int]) -> int:
+        check = {}
+        l, res, distinct = 0, 0, 0
+        for r in range(len(fruits)):
+            check[fruits[r]] = check.get(fruits[r], 0) + 1
+            if check[fruits[r]] == 1:
+                distinct += 1
+            if distinct > 2:
+                check[fruits[l]] -= 1
+                if check[fruits[l]] == 0:
+                    check.pop(fruits[l])
+                    distinct -= 1
+                l += 1
+            if distinct <= 2:
+                res = max(res, r - l + 1)
+        return res
+```
+
+## Problem: 713. Subarray Product Less Than K
+
+Given an array of integers `nums` and an integer `k`, return the number of contiguous subarrays where the product of all the elements in the subarray is strictly less than `k`.
+
+### Example 1
+
+```
+Input: nums = [10,5,2,6], k = 100
+Output: 8
+Explanation: The 8 subarrays that have product less than 100 are:
+[10], [5], [2], [6], [10, 5], [5, 2], [2, 6], [5, 2, 6]
+Note that [10, 5, 2] is not included as the product of 100 is not strictly less than k.
+```
+
+### Example 2
+
+```
+Input: nums = [1,2,3], k = 0
+Output: 0
+```
+
+### Constraints
+
+- `1 <= nums.length <= 3 * 10^4`
+- `1 <= nums[i] <= 1000`
+- `0 <= k <= 10^6`
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def numSubarrayProductLessThanK(self, nums: List[int], k: int) -> int:
+        l, res, prod = 0, 0, 1
+        for r in range(len(nums)):
+            prod *= nums[r]
+            while prod >= k and l <= r:
+                prod /= nums[l]
+                l += 1
+            res += (r-l+1)
+
         return res
 ```
