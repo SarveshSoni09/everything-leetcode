@@ -38,6 +38,31 @@ Output: 0
 
 **Logic:**
 
+This problem introduces the **variable-size sliding window** pattern. Unlike fixed-size windows (Phase 1), here the window size changes dynamically based on a condition. We expand the window until a condition is met, then shrink it while maintaining the condition.
+
+1. **Variable-Size Window Setup:** Start with left pointer `l = 0`, current sum `curr_sum = 0`, and result `res = float('inf')`.
+
+2. **The Expanding Strategy:** Move the right pointer `r` through the array:
+
+   - Add the element at `r` to the current sum: `curr_sum += nums[r]`
+   - If `curr_sum >= target`, we've found a valid window
+
+3. **The Shrinking Strategy:** Once `curr_sum >= target`, we shrink from the left:
+
+   - Update the minimum window size: `res = min(res, r-l+1)`
+   - Remove the leftmost element: `curr_sum -= nums[l]`
+   - Move the left pointer: `l += 1`
+   - Continue shrinking while `curr_sum >= target` (using a `while` loop)
+
+4. **Why This Works:** By shrinking from the left while maintaining `curr_sum >= target`, we find the minimum valid window ending at each position `r`. This ensures we don't miss any optimal solutions.
+
+5. **Key Insight:** The `while` loop for shrinking is crucial. It allows us to keep shrinking until the window becomes invalid, ensuring we've found the smallest valid window ending at each `r`.
+
+6. **Time Complexity:** O(N) - each element is added once (right pointer) and removed at most once (left pointer).
+7. **Space Complexity:** O(1) - only a few variables are used.
+
+This problem establishes the fundamental variable-size sliding window pattern: **expand until condition is met, then shrink while maintaining the condition**.
+
 **Code:**
 
 ```python
@@ -96,6 +121,33 @@ Notice that the answer must be a substring, "pwke" is a subsequence and not a su
 
 **Logic:**
 
+This problem applies the variable-size sliding window pattern to **character uniqueness**. We use a set to track characters in the current window and shrink when a duplicate is encountered.
+
+1. **Variable-Size Window Setup:** Start with left pointer `l = 0`, a set `check` to track characters in the current window, and result `res = 0`.
+
+2. **The Expanding Strategy:** Move the right pointer `r` through the string:
+
+   - If `s[r]` is not in `check`, add it and expand the window
+   - If `s[r]` is already in `check`, we have a duplicate
+
+3. **The Shrinking Strategy:** When a duplicate is found (`s[r] in check`):
+
+   - Remove characters from the left using a `while` loop until the duplicate is eliminated
+   - Remove `s[l]` from `check`: `check.remove(s[l])`
+   - Move the left pointer: `l += 1`
+   - Continue until `s[r]` is no longer in `check`
+
+4. **Tracking the Maximum:** After ensuring no duplicates, add `s[r]` to `check` and update the maximum window size: `res = max(res, r-l+1)`.
+
+5. **Why This Works:** By shrinking from the left until the duplicate is removed, we ensure the window always contains unique characters. This guarantees we find the longest valid window ending at each position `r`.
+
+6. **Key Insight:** Using a `while` loop for shrinking is essential. We must remove all characters from the left until the duplicate `s[r]` is eliminated, not just one character.
+
+7. **Time Complexity:** O(N) - each character is added once and removed at most once.
+8. **Space Complexity:** O(min(N, M)) where M is the size of the charset - the set stores at most all distinct characters in the string.
+
+This problem demonstrates how variable-size sliding windows work with **set-based uniqueness checking**.
+
 **Code:**
 
 ```python
@@ -145,6 +197,37 @@ Bolded numbers were flipped from 0 to 1. The longest subarray is underlined.
 ### Solution
 
 **Logic:**
+
+This problem applies variable-size sliding window to **constraint satisfaction**. We're allowed at most `k` zeros in our window, so we expand until we exceed this limit, then shrink appropriately.
+
+1. **Variable-Size Window Setup:** Start with left pointer `l = 0`, a counter `zeros` to track the number of zeros in the current window, and result `res = 0`.
+
+2. **The Expanding Strategy:** Move the right pointer `r` through the array:
+
+   - If `nums[r] == 1`, it doesn't affect our constraint (we can always include 1s)
+   - If `nums[r] == 0`, we need to check if we can still include it
+
+3. **Handling Zeros:** When we encounter a zero at position `r`:
+
+   - If `zeros < k`: We can include this zero (increment `zeros`)
+   - If `zeros == k`: We've reached our limit, must shrink before including
+
+4. **The Shrinking Strategy:** When `zeros == k` and we encounter another zero:
+
+   - Move `l` forward until we remove one zero: `while nums[l] != 0: l += 1`
+   - Then move `l` one more position to remove that zero: `l += 1`
+   - Now we can include the new zero: `zeros` remains `k`
+
+5. **Tracking the Maximum:** After ensuring the constraint is satisfied, update the maximum window size: `res = max(res, r-l+1)`.
+
+6. **Why This Works:** By tracking the count of zeros and shrinking when we exceed `k`, we maintain a valid window at all times. The window represents the longest subarray with at most `k` zeros ending at position `r`.
+
+7. **Key Insight:** This problem is essentially finding the longest subarray with at most `k` zeros. The flipping operation is conceptual - we're just finding windows where zeros can be flipped to ones.
+
+8. **Time Complexity:** O(N) - each element is visited once, and the left pointer moves forward at most N times.
+9. **Space Complexity:** O(1) - only a few variables are used.
+
+This problem demonstrates how variable-size sliding windows work with **constraint counting** (tracking the count of a specific element type).
 
 **Code:**
 
@@ -199,6 +282,38 @@ There may exists other ways to achieve this answer too.
 
 **Logic:**
 
+This problem combines variable-size sliding window with **frequency tracking**. The key insight is that we want the longest window where we can change all non-majority characters to match the majority character using at most `k` operations.
+
+1. **Variable-Size Window Setup:** Start with left pointer `l = 0`, a frequency map `count` to track character frequencies in the current window, and result `res = 0`.
+
+2. **The Expanding Strategy:** Move the right pointer `r` through the string:
+
+   - Add `s[r]` to the frequency map: `count[s[r]] += 1`
+   - Check if we can still maintain a valid window
+
+3. **The Constraint Check:** For a valid window, the number of characters we need to change is:
+
+   - `window_size - max_frequency = (r-l+1) - max(count.values())`
+   - This represents how many characters differ from the most frequent character
+   - We can change at most `k` characters, so: `(r-l+1) - max(count.values()) <= k`
+
+4. **The Shrinking Strategy:** When the constraint is violated:
+
+   - Remove the leftmost character: `count[s[l]] -= 1`
+   - Move the left pointer: `l += 1`
+   - Continue shrinking while `(r-l+1) - max(count.values()) > k`
+
+5. **Tracking the Maximum:** After ensuring the constraint is satisfied, update the maximum window size: `res = max(res, r-l+1)`.
+
+6. **Why This Works:** The window size `(r-l+1)` minus the maximum frequency gives us the minimum number of replacements needed. By shrinking when this exceeds `k`, we maintain valid windows. We track the maximum window size across all valid windows.
+
+7. **Key Insight:** We don't need to know which character to replace - we just need to ensure that after at most `k` replacements, all characters can be the same. This happens when `window_size - max_frequency <= k`.
+
+8. **Time Complexity:** O(N) - each character is added once and removed at most once. However, `max(count.values())` takes O(26) = O(1) time per operation.
+9. **Space Complexity:** O(1) - the frequency map contains at most 26 entries (one for each uppercase letter).
+
+This problem demonstrates how variable-size sliding windows work with **frequency maps and constraint optimization** (maximizing window size while satisfying a constraint).
+
 **Code:**
 
 ```python
@@ -214,4 +329,3 @@ class Solution:
             res = max(res, r - l + 1)
         return res
 ```
-
