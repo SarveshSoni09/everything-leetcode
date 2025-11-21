@@ -43,5 +43,7 @@ This phase (4 problems) represents the most sophisticated sliding window applica
      - **Reasoning:** Introduces sliding windows with multiplicative constraints. Unlike additive constraints, products grow multiplicatively, requiring careful handling. Most importantly, demonstrates the technique of counting all valid subarrays ending at each position (there are `r-l+1` subarrays for a window `[l, r]`), which is a crucial pattern for subarray counting problems.
   3. `76. Minimum Window Substring`
      - **Reasoning:** The most sophisticated variable-size window problem. Synthesizes frequency maps, validity tracking, and optimization objectives. Introduces the `valid` counter pattern to efficiently track when all character requirements are satisfied without expensive map comparisons. Demonstrates the complete expand-until-valid, then shrink-while-valid strategy for finding minimum optimal windows. This represents the culmination of variable-size window techniques.
-  4. `239. Sliding Window Maximum`
+  4. `239. Sliding Window Maximum ***`
      - **Reasoning:** Introduces the monotonic deque pattern for fixed-size sliding windows requiring extremal value maintenance. Unlike previous problems, this uses a fixed window but requires efficiently maintaining the maximum. Demonstrates how a deque storing indices in decreasing value order can provide O(n) solution instead of naive O(n\*k). This pattern is essential for efficiently querying maximums/minimums in sliding windows.
+
+\*\*\*: Revisit!
