@@ -342,3 +342,158 @@ class Solution:
             slow.next = slow.next.next
         return head
 ```
+
+## Problem: 61. Rotate List
+
+Given the `head` of a linked list, rotate the list to the right by `k` places.
+
+### Example 1
+
+```
+Input: head = [1,2,3,4,5], k = 2
+Output: [4,5,1,2,3]
+```
+
+### Example 2
+
+```
+Input: head = [0,1,2], k = 4
+Output: [2,0,1]
+```
+
+### Constraints
+
+- The number of nodes in the list is in the range `[0, 500].`
+- `-100 <= Node.val <= 100`
+- `0 <= k <= 2 * 10^9`
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def rotateRight(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:
+        if not head or k == 0:
+            return head
+        sz = 1
+        tail = head
+        while tail.next:
+            tail = tail.next
+            sz += 1
+
+        k = k % sz
+        if k == 0:
+            return head
+
+        r = sz - k
+        tail.next = head
+        new_tail = tail
+        while r:
+            new_tail = new_tail.next
+            r -= 1
+
+        head = new_tail.next
+        new_tail.next = None
+        return head
+```
+
+## Problem: 26. Remove Duplicates from Sorted Array
+
+Given an integer array `nums` sorted in non-decreasing order, remove the duplicates in-place such that each unique element appears only once. The relative order of the elements should be kept the same.
+
+Consider the number of unique elements in `nums` to be `k`​​​​​​​​​​​​​​. After removing duplicates, return the number of unique elements `k`.
+
+The first `k` elements of `nums` should contain the unique numbers in sorted order. The remaining elements beyond index `k - 1` can be ignored.
+
+### Example 1
+
+```
+Input: nums = [1,1,2]
+Output: 2, nums = [1,2,_]
+Explanation: Your function should return k = 2, with the first two elements of nums being 1 and 2 respectively.
+It does not matter what you leave beyond the returned k (hence they are underscores).
+```
+
+### Example 2
+
+```
+Input: nums = [0,0,1,1,1,2,2,3,3,4]
+Output: 5, nums = [0,1,2,3,4,_,_,_,_,_]
+Explanation: Your function should return k = 5, with the first five elements of nums being 0, 1, 2, 3, and 4 respectively.
+It does not matter what you leave beyond the returned k (hence they are underscores).
+```
+
+### Constraints
+
+- `1 <= nums.length <= 3 * 10^4`
+- `-100 <= nums[i] <= 100`
+- `nums` is sorted in non-decreasing order.
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def removeDuplicates(self, nums: List[int]) -> int:
+        if not nums:
+            return 0
+
+        i = 0
+        for j in range(1, len(nums)):
+            if nums[i] != nums[j]:
+                i += 1
+                nums[i] = nums[j]
+
+        return i + 1
+```
+
+## Problem: 83. Remove Duplicates from Sorted List
+
+Given the head of a sorted linked list, delete all duplicates such that each element appears only once. Return the linked list sorted as well.
+
+### Example 1
+
+```
+Input: head = [1,1,2]
+Output: [1,2]
+```
+
+### Example 2
+
+```
+Input: head = [1,1,2,3,3]
+Output: [1,2,3]
+```
+
+### Constraints
+
+- The number of nodes in the list is in the range `[0, 300]`.
+- `-100 <= Node.val <= 100`
+- The list is guaranteed to be sorted in ascending order.
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        if not head:
+            return head
+        slow, fast = head, head
+        while fast.next:
+            fast = fast.next
+            if slow.val != fast.val:
+                slow.next = fast
+                slow = slow.next
+        slow.next = None
+        return head
+```
