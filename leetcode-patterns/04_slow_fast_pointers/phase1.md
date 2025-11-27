@@ -668,3 +668,99 @@ class Solution:
             right = right.next
         return True
 ```
+
+## Problem: 448. Find All Numbers Disappeared in an Array
+
+Given an array nums of `n` integers where `nums[i]` is in the range `[1, n]`, return an array of all the integers in the range `[1, n]` that do not appear in `nums`.
+
+### Example 1
+
+```
+Input: nums = [4,3,2,7,8,2,3,1]
+Output: [5,6]
+```
+
+### Example 2
+
+```
+Input: nums = [1,1]
+Output: [2]
+```
+
+### Constraints
+
+- `n == nums.length`
+- `1 <= n <= 10^5`
+- `1 <= nums[i] <= n`
+
+Follow up: Could you do it without extra space and in O(n) runtime? You may assume the returned list does not count as extra space.
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def findDisappearedNumbers(self, nums: List[int]) -> List[int]:
+        res = []
+        for n in nums:
+            i = abs(n) - 1
+            nums[i] = -1 * abs(nums[i])
+        for i , n in enumerate(nums):
+            if n > 0:
+                res.append(i+1)
+        return res
+```
+
+## Problem: 1089. Duplicate Zeros
+
+Given a fixed-length integer array `arr`, duplicate each occurrence of zero, shifting the remaining elements to the right.
+
+Note that elements beyond the length of the original array are not written. Do the above modifications to the input array in place and do not return anything.
+
+### Example 1
+
+```
+Input: arr = [1,0,2,3,0,4,5,0]
+Output: [1,0,0,2,3,0,0,4]
+Explanation: After calling your function, the input array is modified to: [1,0,0,2,3,0,0,4]
+```
+
+### Example 2
+
+```
+Input: arr = [1,2,3]
+Output: [1,2,3]
+Explanation: After calling your function, the input array is modified to: [1,2,3]
+```
+
+### Constraints
+
+- `1 <= arr.length <= 10^4`
+- `0 <= arr[i] <= 9`
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def duplicateZeros(self, arr: List[int]) -> None:
+        n = len(arr)
+        zeros = arr.count(0)
+        i = n - 1
+        j = n + zeros - 1
+        while i >= 0 and j >= 0:
+            if j < n:
+                arr[j] = arr[i]
+            if arr[i] == 0:
+                j -= 1
+                if j < n:
+                    arr[j] = 0
+            i -= 1
+            j -= 1
+```
