@@ -56,16 +56,19 @@ Follow up: Could you write a solution that runs in O(m + n) time and use only O(
 This problem uses a clever two-pointer technique that handles different list lengths by "switching" pointers between the two lists. The key insight is that if we traverse both lists and switch to the other list when we reach the end, both pointers will eventually meet at the intersection point (or both become `None` if there's no intersection).
 
 1. **The Two-Pointer Setup:**
+
    - `slow`: starts at `headA`
    - `fast`: starts at `headB`
 
 2. **The Movement Strategy:**
+
    - Move both pointers one step at a time: `slow = slow.next`, `fast = fast.next`
    - When `slow` reaches the end of list A, switch it to `headB`
    - When `fast` reaches the end of list B, switch it to `headA`
    - Continue until `slow == fast` (intersection found) or both are `None` (no intersection)
 
-3. **Why This Works:** 
+3. **Why This Works:**
+
    - If the lists have the same length and intersect, the pointers will meet at the intersection.
    - If the lists have different lengths, switching pointers compensates for the length difference:
      - After `slow` traverses list A (length `m`) and switches to list B, it will be `m` steps behind the intersection
@@ -73,6 +76,7 @@ This problem uses a clever two-pointer technique that handles different list len
      - Since both pointers now traverse the same "combined" path, they will meet at the intersection
 
 4. **Mathematical Proof:** Let `a` be the length before intersection in list A, `b` be the length before intersection in list B, and `c` be the length of the common part. After switching:
+
    - `slow` has traveled: `a + c + b` steps
    - `fast` has traveled: `b + c + a` steps
    - They've traveled the same distance and will meet at the intersection.
@@ -129,25 +133,30 @@ Output: false
 This problem combines multiple techniques: using slow/fast pointers to find the middle (from Problem 876), reversing a linked list, and comparing two halves. The key insight is to reverse the second half of the list and compare it with the first half.
 
 1. **Find the Middle:** Use slow/fast pointers to find the middle of the list:
+
    - `slow` moves one step, `fast` moves two steps
    - When `fast` reaches the end, `slow` is at the middle (or just past it for even-length lists)
 
 2. **Reverse the Second Half:** Starting from `slow`, reverse the second half of the list:
+
    - Use three pointers: `prev`, `slow` (current), and `temp` (next)
    - Standard linked list reversal technique
 
 3. **Compare the Two Halves:**
+
    - `left` starts at `head` (first half)
    - `right` starts at `prev` (reversed second half, which is the last node of the original list)
    - Compare values while moving both pointers forward
    - If all values match, it's a palindrome
 
-4. **Why This Works:** 
+4. **Why This Works:**
+
    - By reversing the second half, we can traverse it from end to middle
    - Comparing the first half (forward) with the reversed second half (backward) checks if the list reads the same in both directions
    - This avoids needing to store the entire list or use O(n) extra space
 
 5. **Key Insight:** This problem demonstrates combining multiple two-pointer techniques:
+
    - Slow/fast pointers to find the middle
    - Pointer manipulation to reverse a linked list
    - Two pointers to compare two halves
@@ -218,21 +227,25 @@ Follow up: Could you do it without extra space and in O(n) runtime? You may assu
 This problem uses a clever array indexing pattern. Since all values are in the range `[1, n]` and we have `n` elements, we can use the array itself as a hash table by marking indices as "seen" using negative signs.
 
 1. **The Marking Strategy:** For each number `n` in the array:
+
    - Calculate the index it should mark: `i = abs(n) - 1`
    - Mark that index as "seen" by making it negative: `nums[i] = -abs(nums[i])`
    - Use `abs()` to handle cases where the value is already negative
 
-2. **Why This Works:** 
+2. **Why This Works:**
+
    - Each number `n` in the array should mark position `n-1` (since arrays are 0-indexed)
    - If a number from `[1, n]` is missing, its corresponding index will never be marked (will remain positive)
    - After marking, we can scan the array to find all positive values, which indicate missing numbers
 
 3. **Finding Missing Numbers:** After marking:
+
    - Iterate through the array
    - If `nums[i] > 0`, it means index `i+1` was never marked, so `i+1` is a missing number
    - Add `i+1` to the result list
 
 4. **Key Insight:** This demonstrates using **array indices as hash keys** and the array values as markers. This is a powerful technique when:
+
    - Values are in a known range `[1, n]`
    - We need O(1) space
    - We can modify the input array
@@ -295,10 +308,12 @@ This problem requires careful two-pointer manipulation from the end to avoid ove
 1. **Calculate Total Zeros:** First, count the total number of zeros in the array. This tells us how much the array will "expand" (though it's fixed-length, so some elements will be lost).
 
 2. **Two-Pointer Setup from the End:**
+
    - `i`: reads from the original array (starts at `n-1`, the last element)
    - `j`: writes to the "expanded" array (starts at `n + zeros - 1`, accounting for duplicates)
 
 3. **The Backward Strategy:** Work from right to left:
+
    - If `arr[i] == 0`:
      - Write the zero at position `j` (if `j < n`)
      - Decrement `j` and write another zero (duplicate)
@@ -307,7 +322,8 @@ This problem requires careful two-pointer manipulation from the end to avoid ove
      - Write the element at position `j` (if `j < n`)
      - Decrement both `i` and `j`
 
-4. **Why This Works:** 
+4. **Why This Works:**
+
    - Working backwards ensures we don't overwrite elements we haven't processed yet
    - When we encounter a zero, we write it twice (the duplicate)
    - When we encounter a non-zero, we write it once
@@ -339,4 +355,3 @@ class Solution:
             i -= 1
             j -= 1
 ```
-

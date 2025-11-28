@@ -47,17 +47,20 @@ All the integers in `nums` appear only once except for precisely one integer whi
 This problem is a brilliant application of the cycle detection pattern from Phase 1. The key insight is to treat the array as a linked list where `nums[i]` points to `nums[nums[i]]`. The duplicate number creates a cycle in this "linked list."
 
 1. **Array as Linked List:** Treat the array as a linked list:
+
    - Each index `i` represents a node
    - The value `nums[i]` represents the "next" pointer (pointing to index `nums[i]`)
    - Since values are in range `[1, n]` and we have `n+1` elements, the duplicate creates a cycle
 
 2. **Cycle Detection:** Use the slow/fast pointer technique from Problem 141:
+
    - Start both pointers at `nums[0]` (the first "node")
    - `slow = nums[slow]` (move one step)
    - `fast = nums[nums[fast]]` (move two steps)
    - When they meet, we've detected a cycle
 
 3. **Finding the Duplicate:** After detecting the cycle, use the technique from Problem 142:
+
    - Keep `fast` at the meeting point
    - Start `start` from `nums[0]`
    - Move both one step at a time: `start = nums[start]`, `fast = nums[fast]`
@@ -129,11 +132,13 @@ It does not matter what you leave beyond the returned k (hence they are undersco
 
 This problem introduces the **two-pointer technique for in-place array modification**. We use a slow pointer to track where to place unique elements and a fast pointer to scan through the array.
 
-1. **Two-Pointer Setup:** 
+1. **Two-Pointer Setup:**
+
    - `i` (slow pointer): tracks the position where the next unique element should be placed
    - `j` (fast pointer): scans through the array to find unique elements
 
 2. **The Strategy:**
+
    - Start with `i = 0` (first position is always unique)
    - For each `j` from `1` to `len(nums)-1`:
      - If `nums[j] != nums[i]`, we found a new unique element
@@ -199,10 +204,12 @@ Output: [1,2,3]
 This problem applies the same two-pointer technique from Problem 26 to a linked list. The slow pointer maintains the last unique node, while the fast pointer scans ahead to find the next unique value.
 
 1. **Two-Pointer Setup:**
+
    - `slow`: points to the last unique node we've kept
    - `fast`: scans ahead to find nodes with different values
 
 2. **The Strategy:**
+
    - Start with `slow = head` and `fast = head`
    - While `fast.next` exists:
      - Move `fast` forward: `fast = fast.next`
@@ -281,10 +288,12 @@ It does not matter what you leave beyond the returned k (hence they are undersco
 This problem extends the two-pointer pattern from Problem 26 to **filter out specific values**. The slow pointer tracks where to place valid elements, while the fast pointer scans for elements that should be kept.
 
 1. **Two-Pointer Setup:**
+
    - `slow`: tracks the position where the next valid (non-`val`) element should be placed
    - `fast`: scans through the array to find elements that are not equal to `val`
 
 2. **The Strategy:**
+
    - Start with `slow = 0`
    - For each `fast` from `0` to `len(nums)-1`:
      - If `nums[fast] != val`, this is a valid element to keep
@@ -353,11 +362,13 @@ This problem combines multiple two-pointer techniques: finding the list length, 
 3. **Normalize k:** Since rotating by `k` is the same as rotating by `k % sz`, we reduce `k` to be less than the list length. If `k == 0` after normalization, return `head`.
 
 4. **Find Rotation Point:** We need to find the node that will become the new tail. This is the `(sz - k)`th node from the beginning:
+
    - Start from `head` and move `(sz - k)` steps
    - This node's `next` will become the new `head`
    - This node itself will become the new tail
 
 5. **Perform Rotation:**
+
    - Connect the original tail to the original head: `tail.next = head`
    - Set the new head: `head = new_tail.next`
    - Break the cycle: `new_tail.next = None`
@@ -365,6 +376,7 @@ This problem combines multiple two-pointer techniques: finding the list length, 
 6. **Why This Works:** Rotating right by `k` means moving the last `k` nodes to the front. The node at position `sz - k` from the start is where we need to split the list.
 
 7. **Key Insight:** This problem combines:
+
    - Finding list length (single pointer traversal)
    - Finding a specific position from the start (pointer movement)
    - Pointer manipulation to restructure the list
@@ -402,4 +414,3 @@ class Solution:
         new_tail.next = None
         return head
 ```
-
