@@ -44,6 +44,25 @@ Follow up: Can you solve it using `O(1)` (i.e. constant) memory?
 
 **Logic:**
 
+This is the foundational problem for the slow and fast pointer pattern (also known as Floyd's Cycle Detection Algorithm). The key insight is that if there's a cycle, a fast pointer moving at twice the speed of a slow pointer will eventually catch up to the slow pointer.
+
+1. **Initial Setup:** Both `slow` and `fast` pointers start at the `head` of the linked list.
+
+2. **The Movement Strategy:**
+
+   - `slow` moves one step at a time: `slow = slow.next`
+   - `fast` moves two steps at a time: `fast = fast.next.next`
+   - This creates a relative speed difference of 1 step per iteration
+
+3. **Cycle Detection:** If there's a cycle, the fast pointer will eventually "lap" the slow pointer and they will meet at some node. If there's no cycle, the fast pointer will reach the end (`None`) first.
+
+4. **Why This Works:** In a cycle, the fast pointer gains one position on the slow pointer per iteration. Since the cycle has finite length, the fast pointer will eventually catch up. The mathematical proof shows that they will meet within one cycle length.
+
+5. **Time Complexity:** O(N) - in the worst case, we traverse the list once.
+6. **Space Complexity:** O(1) - only two pointers are used, regardless of list size.
+
+This problem establishes the fundamental slow/fast pointer technique: **use two pointers moving at different speeds to detect cycles**.
+
 **Code:**
 
 ```python
@@ -57,6 +76,8 @@ class Solution:
                 return True
         return False
 ```
+
+---
 
 ## Problem: 142. Linked List Cycle II
 
@@ -102,6 +123,26 @@ Follow up: Can you solve it using O(1) (i.e. constant) memory?
 
 **Logic:**
 
+This problem builds directly on Problem 141. After detecting a cycle, we need to find where the cycle starts. The key mathematical insight is that after the slow and fast pointers meet, if we start one pointer from the head and another from the meeting point, moving both at the same speed, they will meet at the cycle start.
+
+1. **Cycle Detection Phase:** First, use the slow/fast pointer technique from Problem 141 to detect if a cycle exists. If `slow == fast` at some point, we have a cycle.
+
+2. **Finding Cycle Start:** After detecting the cycle:
+
+   - Keep `fast` at the meeting point
+   - Start a new pointer `start` from the `head`
+   - Move both `start` and `fast` one step at a time
+   - They will meet at the cycle start node
+
+3. **Why This Works:** The mathematical proof shows that the distance from the head to the cycle start equals the distance from the meeting point to the cycle start (when going around the cycle). This is why moving both pointers at the same speed from these two positions causes them to meet at the cycle start.
+
+4. **Key Insight:** This demonstrates that slow/fast pointers can do more than just detect cycles - they can also locate specific nodes in cycles through careful pointer manipulation.
+
+5. **Time Complexity:** O(N) - we traverse the list at most twice.
+6. **Space Complexity:** O(1) - only three pointers are used.
+
+This problem extends Problem 141 by showing how to **locate the cycle start** after detection.
+
 **Code:**
 
 ```python
@@ -125,66 +166,158 @@ class Solution:
             return None
 ```
 
-## Problem: 287. Find the Duplicate Number
+---
 
-Given an array of integers `nums` containing `n + 1` integers where each integer is in the range `[1, n]` inclusive.
+## Problem: 876. Middle of the Linked List
 
-There is only one repeated number in `nums`, return this repeated number.
+Given the `head` of a singly linked list, return the middle node of the linked list.
 
-You must solve the problem without modifying the array `nums` and using only constant extra space.
+If there are two middle nodes, return the second middle node.
 
 ### Example 1
 
 ```
-Input: nums = [1,3,4,2,2]
-Output: 2
+Input: head = [1,2,3,4,5]
+Output: [3,4,5]
+Explanation: The middle node of the list is node 3.
 ```
 
 ### Example 2
 
 ```
-Input: nums = [3,1,3,4,2]
-Output: 3
-```
-
-### Example 3
-
-```
-Input: nums = [3,3,3,3,3]
-Output: 3
+Input: head = [1,2,3,4,5,6]
+Output: [4,5,6]
+Explanation: Since the list has two middle nodes with values 3 and 4, we return the second one.
 ```
 
 ### Constraints
 
-- `1 <= n <= 10^5`
-- `nums.length == n + 1`
-- `1 <= nums[i] <= n`
-
-All the integers in `nums` appear only once except for precisely one integer which appears two or more times.
-
-- How can we prove that at least one duplicate number must exist in `nums`?
-- Can you solve the problem in linear runtime complexity?
+- The number of nodes in the list is in the range `[1, 100]`.
+- `1 <= Node.val <= 100`
 
 ### Solution
 
 **Logic:**
 
+This problem demonstrates a simple but powerful application of slow/fast pointers: finding the middle of a linked list in a single pass without knowing the length beforehand.
+
+1. **Initial Setup:** Both `slow` and `fast` pointers start at the `head`.
+
+2. **The Movement Strategy:**
+
+   - `slow` moves one step: `slow = slow.next`
+   - `fast` moves two steps: `fast = fast.next.next`
+   - Continue until `fast` reaches the end
+
+3. **Why This Works:** When the fast pointer reaches the end (or `None`), the slow pointer will be at the middle. This is because:
+
+   - If the list has `n` nodes, the fast pointer travels `n` steps
+   - The slow pointer travels `n/2` steps, which is exactly the middle
+   - For even-length lists, `fast` will be at `None` and `slow` will be at the second middle node
+
+4. **Key Insight:** The slow/fast pointer technique naturally finds the middle because the fast pointer travels twice as far, so when it finishes, the slow pointer is halfway.
+
+5. **Time Complexity:** O(N) - we traverse the list once.
+6. **Space Complexity:** O(1) - only two pointers are used.
+
+This problem shows that slow/fast pointers are useful for **finding positions based on relative distances**, not just cycle detection.
+
 **Code:**
 
 ```python
 class Solution:
-    def findDuplicate(self, nums: List[int]) -> int:
-        start = slow = fast = nums[0]
-        while True:
-            slow = nums[slow]
-            fast = nums[nums[fast]]
-            if slow == fast:
-                break
-        while start != fast:
-            start = nums[start]
-            fast = nums[fast]
-        return fast
+    def middleNode(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        slow, fast = head, head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+        return slow
 ```
+
+---
+
+## Problem: 19. Remove Nth Node from End of List
+
+Given the `head` of a linked list, remove the `nth` node from the end of the list and return its `head`.
+
+### Example 1
+
+```
+Input: head = [1,2,3,4,5], n = 2
+Output: [1,2,3,5]
+```
+
+### Example 2
+
+```
+Input: head = [1], n = 1
+Output: []
+```
+
+### Example 3
+
+```
+Input: head = [1,2], n = 1
+Output: [1]
+```
+
+### Constraints
+
+- The number of nodes in the list is sz.
+- `1 <= sz <= 30`
+- `0 <= Node.val <= 100`
+- `1 <= n <= sz`
+
+**Follow up:** Could you do this in one pass?
+
+### Solution
+
+**Logic:**
+
+This problem demonstrates using two pointers with a **fixed offset** to find the nth node from the end. The key insight is that if we maintain `n` nodes between two pointers, when the fast pointer reaches the end, the slow pointer will be at the node before the one we need to remove.
+
+1. **Initial Setup:** Both `slow` and `fast` start at `head`. First, advance `fast` by `n` positions to create the offset.
+
+2. **Edge Case Handling:** If `fast` reaches `None` after advancing `n` steps, it means we need to remove the head node. Return `head.next` in this case.
+
+3. **The Movement Strategy:**
+
+   - Move both `slow` and `fast` one step at a time
+   - Continue until `fast.next` is `None` (fast is at the last node)
+   - At this point, `slow` is at the node **before** the one to remove
+
+4. **Removal:** Set `slow.next = slow.next.next` to skip the nth node from the end.
+
+5. **Why This Works:** By maintaining an `n`-node gap between the pointers, when the fast pointer reaches the end, the slow pointer is exactly `n` positions behind, which is the node before the one we need to remove.
+
+6. **Key Insight:** This demonstrates that two pointers don't always need to move at different speeds - they can move at the same speed but start with an offset to find positions relative to the end.
+
+7. **Time Complexity:** O(N) - we traverse the list once.
+8. **Space Complexity:** O(1) - only two pointers are used.
+
+This problem shows how to use **two pointers with a fixed offset** to find positions from the end of a list.
+
+**Code:**
+
+```python
+class Solution:
+    def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
+        slow, fast = head, head
+        while n != 0:
+            if fast.next:
+                fast = fast.next
+            else:
+                head = head.next
+            n -= 1
+        while fast.next:
+            slow = slow.next
+            fast = fast.next
+        if head:
+            slow.next = slow.next.next
+        return head
+```
+
+---
 
 ## Problem: 202. Happy Number
 
@@ -225,542 +358,49 @@ Output: false
 
 **Logic:**
 
-**Code:**
+This problem applies the cycle detection pattern from Problem 141 to a number sequence. The transformation of a number (sum of squares of digits) creates a sequence that either reaches 1 (happy) or enters a cycle (unhappy). We can use slow/fast pointers to detect this cycle.
 
-```python
-class Solution:
-    def findDuplicate(self, nums: List[int]) -> int:
-        start = slow = fast = nums[0]
-        while True:
-            slow = nums[slow]
-            fast = nums[nums[fast]]
-            if slow == fast:
-                break
-        while start != fast:
-            start = nums[start]
-            fast = nums[fast]
-        return fast
-```
+1. **The Transformation:** Create a helper function that computes the sum of squares of digits. This transformation is applied repeatedly to create a sequence.
 
-## Problem: 876. Middle of the Linked List
+2. **Cycle Detection:** Use slow/fast pointers:
 
-Given the `head` of a singly linked list, return the middle node of the linked list.
+   - `slow` applies the transformation once per step
+   - `fast` applies the transformation twice per step
+   - If we reach 1, the number is happy
+   - If `slow == fast` (and it's not 1), we've detected a cycle, so the number is unhappy
 
-If there are two middle nodes, return the second middle node.
+3. **Why This Works:** The sequence of transformed numbers will either:
 
-### Example 1
+   - Reach 1 and stay at 1 (happy number)
+   - Enter a cycle (unhappy number)
 
-```
-Input: head = [1,2,3,4,5]
-Output: [3,4,5]
-Explanation: The middle node of the list is node 3.
-```
+   The slow/fast pointer technique detects cycles just like in Problem 141.
 
-### Example 2
+4. **Key Insight:** This demonstrates that the slow/fast pointer pattern applies to **any sequence** where we can define a "next" operation, not just linked lists. The pattern works for detecting cycles in mathematical sequences.
 
-```
-Input: head = [1,2,3,4,5,6]
-Output: [4,5,6]
-Explanation: Since the list has two middle nodes with values 3 and 4, we return the second one.
-```
+5. **Time Complexity:** O(log N) - the number of digits in `n` is logarithmic, and we detect cycles quickly.
+6. **Space Complexity:** O(1) - only a few variables are used, no extra space for storing visited numbers.
 
-### Constraints
-
-- The number of nodes in the list is in the range `[1, 100]`.
-- `1 <= Node.val <= 100`
-
-### Solution
-
-**Logic:**
+This problem shows that slow/fast pointers can detect cycles in **abstract sequences**, not just linked list structures.
 
 **Code:**
 
 ```python
 class Solution:
-    def middleNode(self, head: Optional[ListNode]) -> Optional[ListNode]:
-        slow, fast = head, head
-        while fast and fast.next:
-            slow = slow.next
-            fast = fast.next.next
-        return slow
-```
-
-## Problem: 19. Remove Nth Node from End of List
-
-Given the `head` of a linked list, remove the `nth` node from the end of the list and return its `head`.
-
-### Example 1
-
-```
-Input: head = [1,2,3,4,5], n = 2
-Output: [1,2,3,5]
-```
-
-### Example 2
-
-```
-Input: head = [1], n = 1
-Output: []
-```
-
-### Example 3
-
-```
-Input: head = [1,2], n = 1
-Output: [1]
-```
-
-### Constraints
-
-- The number of nodes in the list is sz.
-- `1 <= sz <= 30`
-- `0 <= Node.val <= 100`
-- `1 <= n <= sz`
-
-**Follow up:** Could you do this in one pass?
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
-        slow, fast = head, head
-        while n != 0:
-            if fast.next:
-                fast = fast.next
-            else:
-                head = head.next
-            n -= 1
-        while fast.next:
-            slow = slow.next
-            fast = fast.next
-        if head:
-            slow.next = slow.next.next
-        return head
-```
-
-## Problem: 61. Rotate List
-
-Given the `head` of a linked list, rotate the list to the right by `k` places.
-
-### Example 1
-
-```
-Input: head = [1,2,3,4,5], k = 2
-Output: [4,5,1,2,3]
-```
-
-### Example 2
-
-```
-Input: head = [0,1,2], k = 4
-Output: [2,0,1]
-```
-
-### Constraints
-
-- The number of nodes in the list is in the range `[0, 500].`
-- `-100 <= Node.val <= 100`
-- `0 <= k <= 2 * 10^9`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def rotateRight(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:
-        if not head or k == 0:
-            return head
-        sz = 1
-        tail = head
-        while tail.next:
-            tail = tail.next
-            sz += 1
-
-        k = k % sz
-        if k == 0:
-            return head
-
-        r = sz - k
-        tail.next = head
-        new_tail = tail
-        while r:
-            new_tail = new_tail.next
-            r -= 1
-
-        head = new_tail.next
-        new_tail.next = None
-        return head
-```
-
-## Problem: 26. Remove Duplicates from Sorted Array
-
-Given an integer array `nums` sorted in non-decreasing order, remove the duplicates in-place such that each unique element appears only once. The relative order of the elements should be kept the same.
-
-Consider the number of unique elements in `nums` to be `k`​​​​​​​​​​​​​​. After removing duplicates, return the number of unique elements `k`.
-
-The first `k` elements of `nums` should contain the unique numbers in sorted order. The remaining elements beyond index `k - 1` can be ignored.
-
-### Example 1
-
-```
-Input: nums = [1,1,2]
-Output: 2, nums = [1,2,_]
-Explanation: Your function should return k = 2, with the first two elements of nums being 1 and 2 respectively.
-It does not matter what you leave beyond the returned k (hence they are underscores).
-```
-
-### Example 2
-
-```
-Input: nums = [0,0,1,1,1,2,2,3,3,4]
-Output: 5, nums = [0,1,2,3,4,_,_,_,_,_]
-Explanation: Your function should return k = 5, with the first five elements of nums being 0, 1, 2, 3, and 4 respectively.
-It does not matter what you leave beyond the returned k (hence they are underscores).
-```
-
-### Constraints
-
-- `1 <= nums.length <= 3 * 10^4`
-- `-100 <= nums[i] <= 100`
-- `nums` is sorted in non-decreasing order.
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def removeDuplicates(self, nums: List[int]) -> int:
-        if not nums:
-            return 0
-
-        i = 0
-        for j in range(1, len(nums)):
-            if nums[i] != nums[j]:
-                i += 1
-                nums[i] = nums[j]
-
-        return i + 1
-```
-
-## Problem: 83. Remove Duplicates from Sorted List
-
-Given the head of a sorted linked list, delete all duplicates such that each element appears only once. Return the linked list sorted as well.
-
-### Example 1
-
-```
-Input: head = [1,1,2]
-Output: [1,2]
-```
-
-### Example 2
-
-```
-Input: head = [1,1,2,3,3]
-Output: [1,2,3]
-```
-
-### Constraints
-
-- The number of nodes in the list is in the range `[0, 300]`.
-- `-100 <= Node.val <= 100`
-- The list is guaranteed to be sorted in ascending order.
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
-        if not head:
-            return head
-        slow, fast = head, head
-        while fast.next:
-            fast = fast.next
-            if slow.val != fast.val:
-                slow.next = fast
-                slow = slow.next
-        slow.next = None
-        return head
-```
-
-## Problem: 27. Remove Element
-
-Given an integer array `nums` and an integer `val`, remove all occurrences of `val` in `nums` in-place. The order of the elements may be changed. Then return the number of elements in `nums` which are not equal to `val`.
-
-Consider the number of elements in `nums` which are not equal to `val` be `k`, to get accepted, you need to do the following things:
-
-- Change the array nums such that the first `k` elements of `nums` contain the elements which are not equal to `val`. The remaining elements of `nums` are not important as well as the size of `nums`.
-- Return `k`.
-
-### Example 1
-
-```
-Input: nums = [3,2,2,3], val = 3
-Output: 2, nums = [2,2,_,_]
-Explanation: Your function should return k = 2, with the first two elements of nums being 2.
-It does not matter what you leave beyond the returned k (hence they are underscores).
-```
-
-### Example 2
-
-```
-Input: nums = [0,1,2,2,3,0,4,2], val = 2
-Output: 5, nums = [0,1,4,0,3,_,_,_]
-Explanation: Your function should return k = 5, with the first five elements of nums containing 0, 0, 1, 3, and 4.
-```
-
-Note that the five elements can be returned in any order.  
-It does not matter what you leave beyond the returned k (hence they are underscores).
-
-### Constraints
-
-- `0 <= nums.length <= 100`
-- `0 <= nums[i] <= 50`
-- `0 <= val <= 100`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def removeElement(self, nums: List[int], val: int) -> int:
-        slow = 0
-        for fast in range(len(nums)):
-            if nums[fast] != val:
-                nums[slow] = nums[fast]
-                slow += 1
-        return slow
-```
-
-## Problem: 160. Intersection of Two Linked Lists
-
-Given the heads of two singly linked-lists `headA` and `headB`, return the node at which the two lists intersect. If the two linked lists have no intersection at all, return `null`.
-
-The test cases are generated such that there are no cycles anywhere in the entire linked structure.
-
-Note that the linked lists must retain their original structure after the function returns.
-
-### Example 1
-
-```
-Input: intersectVal = 8, listA = [4,1,8,4,5], listB = [5,6,1,8,4,5], skipA = 2, skipB = 3
-Output: Intersected at '8'
-Explanation: The intersected node's value is 8 (note that this must not be 0 if the two lists intersect).
-From the head of A, it reads as [4,1,8,4,5]. From the head of B, it reads as [5,6,1,8,4,5]. There are 2 nodes before the intersected node in A; There are 3 nodes before the intersected node in B.
-- Note that the intersected node's value is not 1 because the nodes with value 1 in A and B (2nd node in A and 3rd node in B) are different node references. In other words, they point to two different locations in memory, while the nodes with value 8 in A and B (3rd node in A and 4th node in B) point to the same location in memory.
-```
-
-### Example 2
-
-```
-Input: intersectVal = 2, listA = [1,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
-Output: Intersected at '2'
-Explanation: The intersected node's value is 2 (note that this must not be 0 if the two lists intersect).
-From the head of A, it reads as [1,9,1,2,4]. From the head of B, it reads as [3,2,4]. There are 3 nodes before the intersected node in A; There are 1 node before the intersected node in B.
-```
-
-### Example 3
-
-```
-Input: intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
-Output: No intersection
-Explanation: From the head of A, it reads as [2,6,4]. From the head of B, it reads as [1,5]. Since the two lists do not intersect, intersectVal must be 0, while skipA and skipB can be arbitrary values.
-Explanation: The two lists do not intersect, so return null.
-```
-
-### Constraints
-
-- The number of nodes of `listA` is in the `m`.
-- The number of nodes of `listB` is in the `n`.
-- `1 <= m, n <= 3 * 104`
-- `1 <= Node.val <= 105`
-- `0 <= skipA <= m`
-- `0 <= skipB <= n`
-- `intersectVal` is `0` if `listA` and `listB` do not intersect.
-- `intersectVal == listA[skipA] == listB[skipB]` if `listA` and `listB` intersect.
-
-Follow up: Could you write a solution that runs in O(m + n) time and use only O(1) memory?
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
-        fast = headB
-        slow = headA
-        while slow != fast:
-            slow = slow.next if slow else headB
-            fast = fast.next if fast else headA
-        return slow
-```
-
-## Problem: 234. Palindrome List
-
-Given the `head` of a singly linked list, return `true` if it is a palindrome or `false` otherwise.
-
-### Example 1
-
-```
-Input: head = [1,2,2,1]
-Output: true
-```
-
-### Example 2
-
-```
-Input: head = [1,2]
-Output: false
-```
-
-### Constraints
-
-- The number of nodes in the list is in the range `[1, 105]`.
-- `0 <= Node.val <= 9`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def isPalindrome(self, head: Optional[ListNode]) -> bool:
-        slow, fast = head, head
-        while fast and fast.next:
-            fast = fast.next.next
-            slow = slow.next
-
-        prev = None
-        while slow:
-            temp = slow.next
-            slow.next = prev
-            prev = slow
-            slow = temp
-
-        left, right = head, prev
-        while right:
-            if left.val != right.val:
-                return False
-            left = left.next
-            right = right.next
-        return True
-```
-
-## Problem: 448. Find All Numbers Disappeared in an Array
-
-Given an array nums of `n` integers where `nums[i]` is in the range `[1, n]`, return an array of all the integers in the range `[1, n]` that do not appear in `nums`.
-
-### Example 1
-
-```
-Input: nums = [4,3,2,7,8,2,3,1]
-Output: [5,6]
-```
-
-### Example 2
-
-```
-Input: nums = [1,1]
-Output: [2]
-```
-
-### Constraints
-
-- `n == nums.length`
-- `1 <= n <= 10^5`
-- `1 <= nums[i] <= n`
-
-Follow up: Could you do it without extra space and in O(n) runtime? You may assume the returned list does not count as extra space.
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def findDisappearedNumbers(self, nums: List[int]) -> List[int]:
-        res = []
-        for n in nums:
-            i = abs(n) - 1
-            nums[i] = -1 * abs(nums[i])
-        for i , n in enumerate(nums):
-            if n > 0:
-                res.append(i+1)
-        return res
-```
-
-## Problem: 1089. Duplicate Zeros
-
-Given a fixed-length integer array `arr`, duplicate each occurrence of zero, shifting the remaining elements to the right.
-
-Note that elements beyond the length of the original array are not written. Do the above modifications to the input array in place and do not return anything.
-
-### Example 1
-
-```
-Input: arr = [1,0,2,3,0,4,5,0]
-Output: [1,0,0,2,3,0,0,4]
-Explanation: After calling your function, the input array is modified to: [1,0,0,2,3,0,0,4]
-```
-
-### Example 2
-
-```
-Input: arr = [1,2,3]
-Output: [1,2,3]
-Explanation: After calling your function, the input array is modified to: [1,2,3]
-```
-
-### Constraints
-
-- `1 <= arr.length <= 10^4`
-- `0 <= arr[i] <= 9`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def duplicateZeros(self, arr: List[int]) -> None:
-        n = len(arr)
-        zeros = arr.count(0)
-        i = n - 1
-        j = n + zeros - 1
-        while i >= 0 and j >= 0:
-            if j < n:
-                arr[j] = arr[i]
-            if arr[i] == 0:
-                j -= 1
-                if j < n:
-                    arr[j] = 0
-            i -= 1
-            j -= 1
+    def isHappy(self, n: int) -> bool:
+        def get_next(num):
+            total = 0
+            while num > 0:
+                num, digit = divmod(num, 10)
+                total += digit ** 2
+            return total
+
+        slow = n
+        fast = get_next(n)
+
+        while fast != 1 and slow != fast:
+            slow = get_next(slow)
+            fast = get_next(get_next(fast))
+
+        return fast == 1
 ```
