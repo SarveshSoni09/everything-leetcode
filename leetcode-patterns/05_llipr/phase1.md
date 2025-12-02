@@ -300,3 +300,157 @@ class Solution:
             l1 = l1.next.next
         return head
 ```
+
+## Problem: 445. Add Two Numbers II
+
+You are given two non-empty linked lists representing two non-negative integers. The most significant digit comes first and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.
+
+You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+
+### Example 1
+
+```
+Input: l1 = [7,2,4,3], l2 = [5,6,4]
+Output: [7,8,0,7]
+```
+
+### Example 2
+
+```
+Input: l1 = [2,4,3], l2 = [5,6,4]
+Output: [8,0,7]
+```
+
+### Example 3
+
+```
+Input: l1 = [0], l2 = [0]
+Output: [0]
+```
+
+### Constraints
+
+- The number of nodes in each linked list is in the range `[1, 100]`.
+- `0 <= Node.val <= 9`
+- It is guaranteed that the list represents a number that does not have leading zeros.
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+
+        list1 = self.reverseList(l1)
+        list2 = self.reverseList(l2)
+        carry = 0
+        res = ListNode()
+        head = res
+
+        while list1 or list2 or carry:
+            val1 = list1.val if list1 else 0
+            val2 = list2.val if list2 else 0
+            sum_val = val1 + val2 + carry
+            new_val = sum_val % 10
+            carry = sum_val // 10
+            res.next = ListNode(new_val, None)
+            res = res.next
+            list1 = list1.next if list1 else None
+            list2 = list2.next if list2 else None
+        ListNode(carry, None)
+
+        return self.reverseList(head.next)
+
+
+    def reverseList(self, head):
+        prev = None
+        while head:
+            temp = head.next
+            head.next = prev
+            prev = head
+            head = temp
+        return prev
+```
+
+## Problem: 2130. Maximum Twin Sum of a Linked List
+
+In a linked list of size `n`, where `n` is even, the `ith` node (0-indexed) of the linked list is known as the twin of the `(n-1-i)th` node, if `0 <= i <= (n / 2) - 1`.
+
+For example, if `n = 4`, then node `0` is the twin of node `3`, and node `1` is the twin of node `2`. These are the only nodes with twins for `n = 4`.
+The twin sum is defined as the sum of a node and its twin.
+
+Given the `head` of a linked list with even length, return the maximum twin sum of the linked list.
+
+### Example 1
+
+```
+Input: head = [5,4,2,1]
+Output: 6
+Explanation:
+Nodes 0 and 1 are the twins of nodes 3 and 2, respectively. All have twin sum = 6.
+There are no other nodes with twins in the linked list.
+Thus, the maximum twin sum of the linked list is 6.
+```
+
+### Example 2
+
+```
+Input: head = [4,2,2,3]
+Output: 7
+Explanation:
+The nodes with twins present in this linked list are:
+- Node 0 is the twin of node 3 having a twin sum of 4 + 3 = 7.
+- Node 1 is the twin of node 2 having a twin sum of 2 + 2 = 4.
+Thus, the maximum twin sum of the linked list is max(7, 4) = 7.
+```
+
+### Example 3
+
+```
+Input: head = [1,100000]
+Output: 100001
+Explanation:
+There is only one node with a twin in the linked list having twin sum of 1 + 100000 = 100001.
+```
+
+### Constraints
+
+- The number of nodes in the list is an even integer in the range `[2, 10^5]`.
+- `1 <= Node.val <= 105`
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def pairSum(self, head: Optional[ListNode]) -> int:
+        slow = head
+        fast = head.next
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+
+        right = slow.next
+        slow.next = None
+        prev = None
+        while right:
+            temp = right.next
+            right.next= prev
+            prev = right
+            right = temp
+        right = prev
+
+        left = head
+        res = 0
+        while right:
+            res = max(res, left.val + right.val)
+            left = left.next
+            right = right.next
+        return res
+```
