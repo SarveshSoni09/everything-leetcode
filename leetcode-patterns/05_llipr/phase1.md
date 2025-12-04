@@ -454,3 +454,120 @@ class Solution:
             right = right.next
         return res
 ```
+
+## Problem: 2487. Remove Nodes From Linked List
+
+You are given the `head` of a linked list.
+
+Remove every node which has a node with a greater value anywhere to the right side of it.
+
+Return the `head` of the modified linked list.
+
+### Example 1
+
+```
+Input: head = [5,2,13,3,8]
+Output: [13,8]
+Explanation: The nodes that should be removed are 5, 2 and 3.
+- Node 13 is to the right of node 5.
+- Node 13 is to the right of node 2.
+- Node 8 is to the right of node 3.
+```
+
+### Example 2
+
+```
+Input: head = [1,1,1,1]
+Output: [1,1,1,1]
+Explanation: Every node has value 1, so no nodes are removed.
+```
+
+### Constraints
+
+- The number of the nodes in the given list is in the range `[1, 10^5]`.
+- `1 <= Node.val <= 10^5`
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def removeNodes(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        prev = slow = self.reverseList(head)
+        fast = slow.next
+        curr_max = slow.val
+        while fast:
+            curr_max = max(curr_max, fast.val)
+            if fast.val < curr_max:
+                slow.next = fast.next
+            else:
+                slow = slow.next
+            fast = fast.next
+        return self.reverseList(prev)
+
+    def reverseList(self, curr):
+        prev = None
+        while curr:
+            temp = curr.next
+            curr.next = prev
+            prev = curr
+            curr = temp
+        return prev
+```
+
+## 203. Remove Linked List Elements
+
+Given the `head` of a linked list and an integer `val`, remove all the nodes of the linked list that has `Node.val == val`, and return the new `head`.
+
+### Example 1
+
+```
+Input: head = [1,2,6,3,4,5,6], val = 6
+Output: [1,2,3,4,5]
+```
+
+### Example 2
+
+```
+Input: head = [], val = 1
+Output: []
+```
+
+### Example 3
+
+```
+Input: head = [7,7,7,7], val = 7
+Output: []
+```
+
+### Constraints
+
+- The number of nodes in the list is in the range `[0, 10^4]`.
+- `1 <= Node.val <= 50`
+- `0 <= val <= 50`
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def removeElements(self, head: Optional[ListNode], val: int) -> Optional[ListNode]:
+        if not head:
+            return head
+        new_head = ListNode(0, head)
+        slow = new_head
+        fast = slow.next
+        while fast:
+            if fast.val == val:
+                slow.next = fast.next
+            else:
+                slow = slow.next
+            fast = fast.next
+        return new_head.next
+```
