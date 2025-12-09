@@ -177,3 +177,134 @@ class Solution:
                 stack.append(i)
         return result
 ```
+
+## Problem: 901. Online Stock Span
+
+Design an algorithm that collects daily price quotes for some stock and returns the span of that stock's price for the current day.
+
+The span of the stock's price in one day is the maximum number of consecutive days (starting from that day and going backward) for which the stock price was less than or equal to the price of that day.
+
+- For example, if the prices of the stock in the last four days is `[7,2,1,2]` and the price of the stock today is 2, then the span of today is 4 because starting from today, the price of the stock was less than or equal 2 for 4 consecutive days.
+- Also, if the prices of the stock in the last four days is `[7,34,1,2]` and the price of the stock today is `8`, then the span of today is `3` because starting from today, the price of the stock was less than or equal `8` for `3` consecutive days.
+  Implement the `StockSpanner` class:
+
+- `StockSpanner()` Initializes the object of the class.
+- `int next(int price)` Returns the span of the stock's price given that today's price is price.
+
+### Example 1
+
+```
+Input
+["StockSpanner", "next", "next", "next", "next", "next", "next", "next"]
+[[], [100], [80], [60], [70], [60], [75], [85]]
+Output
+[null, 1, 1, 1, 2, 1, 4, 6]
+
+Explanation
+StockSpanner stockSpanner = new StockSpanner();
+stockSpanner.next(100); // return 1
+stockSpanner.next(80);  // return 1
+stockSpanner.next(60);  // return 1
+stockSpanner.next(70);  // return 2
+stockSpanner.next(60);  // return 1
+stockSpanner.next(75);  // return 4, because the last 4 prices (including today's price of 75) were less than or equal to today's price.
+stockSpanner.next(85);  // return 6
+```
+
+### Constraints
+
+- `1 <= price <= 10^5`
+- At most `10^4` calls will be made to next.
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class StockSpanner:
+
+    def __init__(self):
+        self.stack = []
+
+    def next(self, price: int) -> int:
+        span = 1
+        while self.stack and self.stack[-1][0] <= price:
+            span += self.stack[-1][1]
+            self.stack.pop()
+        self.stack.append([price, span])
+        return span
+```
+
+## Problem: 1019. Next Greater Node In Linked List
+
+You are given the `head` of a linked list with `n` nodes.
+
+For each node in the list, find the value of the next greater node. That is, for each node, find the value of the first node that is next to it and has a strictly larger value than it.
+
+Return an integer array `answer` where `answer[i]` is the value of the next greater node of the `ith` node (1-indexed). If the `ith` node does not have a next greater node, set `answer[i] = 0`.
+
+### Example 1
+
+```
+Input: head = [2,1,5]
+Output: [5,5,0]
+```
+
+### Example 2
+
+```
+Input: head = [2,7,4,3,5]
+Output: [7,0,5,5,0]
+```
+
+### Constraints
+
+- The number of nodes in the list is `n`.
+- `1 <= n <= 10^4`
+- `1 <= Node.val <= 10^9`
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def nextLargerNodes(self, head: Optional[ListNode]) -> List[int]:
+        curr = head
+        nums = []
+        while curr:
+            nums.append(curr.val)
+            curr = curr.next
+        stack = []
+        answer = [0] * len(nums)
+        for i, n in enumerate(nums):
+            while stack and stack[-1][0] < n:
+                idx = stack.pop()[1]
+                answer[idx] = n
+            stack.append([n, i])
+        return answer
+```
+
+Or
+
+```python
+class Solution:
+    def nextLargerNodes(self, head: Optional[ListNode]) -> List[int]:
+        res = []
+        stack = []
+        index = 0
+        curr = head
+        while curr:
+            res.append(0)
+            while stack and stack[-1][1] < curr.val:
+                i, value = stack.pop()
+                res[i] = curr.val
+            stack.append([index, curr.val])
+            index +=1
+            curr = curr.next
+        return res
+```
