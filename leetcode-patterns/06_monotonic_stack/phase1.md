@@ -308,3 +308,98 @@ class Solution:
             curr = curr.next
         return res
 ```
+
+## 1762. Buildings With an Ocean View
+
+You are given an array `heights` representing the heights of `n` buildings arranged in a line from left to right. The ocean is located to the right of the last building.
+
+A building has an "ocean view" if it can see the ocean without any obstruction. Formally, a building at index $i$ has an ocean view if all buildings to its right (i.e., at indices $j > i$) are strictly shorter than it is.
+
+Your task is to find all buildings that have an ocean view and return their indices (0-indexed) in ascending (left-to-right) order.
+
+### Example 1
+
+```
+Input: heights = [4, 2, 3, 1]
+Output: [0, 2, 3]
+Explanation: Building 0 (height 4) has an ocean view because all buildings to its right (2, 3, 1) are shorter.
+Building 2 (height 3) has an ocean view because the only building to its right (1) is shorter.
+Building 3 (height 1) is the rightmost building, so it always has an ocean view.
+```
+
+### Example 2
+
+```
+Input: heights = [1, 3, 2, 4]
+Output: [3]
+Explanation: Only the last building (height 4) has an ocean view.
+Building 1 (height 3) is blocked by building 3 (height 4).
+```
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def oceanView(self, heights: List[int]) -> List[int]:
+        stack = []
+        answer = []
+        for i, n in enumerate(heights):
+            while stack and stack[-1][0] < n:
+                stack.pop()[1]
+            stack.append([n, i])
+        for h in stack:
+            answer.append(h[1])`
+        return answer
+```
+
+## Problem: 84. Largest Rectangle in Histogram
+
+Given an array of integers `heights` representing the histogram's bar height where the width of each bar is `1`, return the area of the largest rectangle in the histogram.
+
+### Example 1
+
+```
+Input: heights = [2,1,5,6,2,3]
+Output: 10
+Explanation: The above is a histogram where width of each bar is 1.
+The largest rectangle is shown in the red area, which has an area = 10 units.
+```
+
+### Example 2
+
+```
+Input: heights = [2,4]
+Output: 4
+```
+
+### Constraints
+
+- `1 <= heights.length <= 10^5`
+- `0 <= heights[i] <= 10^4`
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def largestRectangleArea(self, heights: List[int]) -> int:
+        max_area = 0
+        stack = []
+        for idx, height in enumerate(heights):
+            start = idx
+            while stack and stack[-1][1] > height:
+                i, h = stack.pop()
+                max_area = max(max_area, h * (idx - i))
+                start = i
+            stack.append([start, height])
+        for idx, height in stack:
+            max_area = max(max_area, height * (len(heights) - idx))
+        return max_area
+```
