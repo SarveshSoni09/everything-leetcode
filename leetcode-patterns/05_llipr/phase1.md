@@ -36,6 +36,28 @@ Follow up: A linked list can be reversed either iteratively or recursively. Coul
 
 **Logic:**
 
+This is the foundational problem for linked list reversal. The key insight is to use three pointers to reverse the links in-place: `prevN` (previous node), `currN` (current node), and `nextN` (next node to process).
+
+1. **Three-Pointer Setup:**
+
+   - `prevN = None` (will become the new head after reversal)
+   - `currN = head` (current node being processed)
+   - `nextN` (temporarily stores the next node)
+
+2. **The Reversal Process:** For each node:
+
+   - Save the next node: `nextN = currN.next`
+   - Reverse the link: `currN.next = prevN`
+   - Move pointers forward: `prevN = currN`, `currN = nextN`
+   - Continue until `currN` is `None`
+
+3. **Why This Works:** By reversing each link and moving forward, we build the reversed list from the end. When `currN` becomes `None`, `prevN` points to the last node, which is now the new head.
+
+4. **Time Complexity:** O(N) - we traverse the list once.
+5. **Space Complexity:** O(1) - only three pointers are used.
+
+This problem establishes the fundamental **three-pointer reversal technique** that will be extended in subsequent problems.
+
 **Code:**
 
 ```python
@@ -81,6 +103,28 @@ Output: [5]
 ### Solution
 
 **Logic:**
+
+This problem extends Problem 206 by reversing only a portion of the list. The key is to find the boundaries, reverse the sublist using the same three-pointer technique, and reconnect it properly.
+
+1. **Finding the Subsection:** Traverse until reaching position `left`, keeping track of the node before the reversal section (`prevN`).
+
+2. **Reversing the Subsection:** Once at position `left`:
+
+   - Use the same three-pointer reversal technique from Problem 206
+   - Reverse nodes from `left` to `right`
+   - Store `leftN` (the first node of the reversed section) to reconnect later
+
+3. **Reconnecting:** After reversal:
+
+   - If `prevN` exists, connect it to the new head of the reversed section (`prevL`)
+   - Connect `leftN.next` to the node after the reversed section (`currN`)
+
+4. **Edge Case:** If `left == 1`, the entire list is reversed, so return `prevL` instead of `head`.
+
+5. **Time Complexity:** O(N) - we traverse the list once.
+6. **Space Complexity:** O(1) - only a few pointers are used.
+
+This problem demonstrates how to **apply the reversal technique to a subsection** of a linked list.
 
 **Code:**
 
@@ -141,6 +185,31 @@ Output: [3,2,1,4,5]
 ### Solution
 
 **Logic:**
+
+This problem extends the reversal pattern to process the list in groups of `k`. The key is to repeatedly reverse groups of `k` nodes using the same three-pointer technique from Problem 206.
+
+1. **Group Processing:** Use a dummy head to simplify edge cases. For each group:
+
+   - Find the `kth` node from `group_prev` using `get_kth()`
+   - If there aren't `k` nodes remaining, stop (leave them as-is)
+
+2. **Reversing a Group:** Once we have `k` nodes:
+
+   - Store `group_next = kth.next` (the node after this group)
+   - Reverse the group using the three-pointer technique, with `prev = group_next` (points to the next group)
+   - After reversal, `kth` becomes the new head of this group
+
+3. **Reconnecting:**
+
+   - Connect `group_prev.next` to `kth` (the new head of the reversed group)
+   - Move `group_prev` to the last node of the current group (which was the first node before reversal)
+
+4. **Why This Works:** By reversing each group and properly reconnecting, we process the list in chunks. The `group_prev` pointer maintains the connection between groups.
+
+5. **Time Complexity:** O(N) - we visit each node once.
+6. **Space Complexity:** O(1) - only a few pointers are used.
+
+This problem demonstrates **repeated application of the reversal technique** to process the list in groups.
 
 **Code:**
 
@@ -217,6 +286,26 @@ Output: [2,1,3]
 
 **Logic:**
 
+This problem is a special case of Problem 25 with `k = 2`. We swap adjacent pairs by manipulating pointers to reverse pairs of nodes.
+
+1. **Dummy Head Setup:** Use a dummy head to simplify edge cases and handle the case where we need to update the head.
+
+2. **Pair Swapping:** For each pair:
+
+   - Store `new_next = curr.next.next` (the node after the pair)
+   - Connect `prev.next` to `curr.next` (the second node becomes first)
+   - Update `prev` to `curr` (the first node, which will be second)
+   - Connect `curr.next.next` to `curr` (complete the swap)
+   - Connect `curr.next` to `new_next` (link to the next pair)
+   - Move `curr` to `new_next` (process next pair)
+
+3. **Why This Works:** By carefully reordering the `next` pointers, we swap pairs without modifying values. The dummy head ensures we can always update `prev.next`.
+
+4. **Time Complexity:** O(N) - we traverse the list once.
+5. **Space Complexity:** O(1) - only a few pointers are used.
+
+This problem demonstrates **pairwise swapping** as a simplified case of group reversal.
+
 **Code:**
 
 ```python
@@ -270,6 +359,27 @@ Output: [1,5,2,4,3]
 ### Solution
 
 **Logic:**
+
+This problem combines multiple techniques: finding the middle (slow/fast pointers), reversing the second half (Problem 206), and interleaving two lists. The key is to split the list, reverse the second half, then merge them alternately.
+
+1. **Find the Middle:** Use slow/fast pointers to find the middle node. Set `slow.next = None` to split the list into two halves.
+
+2. **Reverse the Second Half:** Apply the three-pointer reversal technique from Problem 206 to reverse the second half (`l2`).
+
+3. **Interleave the Lists:** Merge the two halves alternately:
+
+   - Store `temp = l1.next` (save the next node in first half)
+   - Connect `l1.next` to `l2` (link first half to second half)
+   - Move `l2` forward
+   - Connect `l1.next.next` to `temp` (link back to first half)
+   - Move `l1` two steps forward
+
+4. **Why This Works:** By reversing the second half and interleaving, we achieve the desired pattern: `L0 → Ln → L1 → Ln-1 → ...`
+
+5. **Time Complexity:** O(N) - we traverse the list multiple times but each node is visited a constant number of times.
+6. **Space Complexity:** O(1) - only pointers are used.
+
+This problem demonstrates **combining reversal with list interleaving** to achieve complex reordering.
 
 **Code:**
 
@@ -425,6 +535,24 @@ There is only one node with a twin in the linked list having twin sum of 1 + 100
 
 **Logic:**
 
+This problem uses the same approach as Problem 143: find the middle, reverse the second half, then compare corresponding nodes. However, instead of reordering, we calculate the sum of twin pairs.
+
+1. **Find the Middle:** Use slow/fast pointers. Since the list has even length, `slow.next` is the start of the second half.
+
+2. **Reverse the Second Half:** Apply the reversal technique from Problem 206 to reverse the second half.
+
+3. **Calculate Twin Sums:** Traverse both halves simultaneously:
+
+   - For each pair of corresponding nodes, calculate `left.val + right.val`
+   - Track the maximum sum
+
+4. **Why This Works:** After reversing the second half, the first node of the reversed half pairs with the first node of the first half, the second with the second, etc., which are exactly the twin pairs.
+
+5. **Time Complexity:** O(N) - we traverse the list multiple times but each node is visited a constant number of times.
+6. **Space Complexity:** O(1) - only pointers are used.
+
+This problem demonstrates using **reversal to pair nodes from opposite ends** for computation.
+
 **Code:**
 
 ```python
@@ -491,6 +619,25 @@ Explanation: Every node has value 1, so no nodes are removed.
 
 **Logic:**
 
+This problem uses reversal as a technique to process the list from right to left. By reversing the list, we can easily identify and remove nodes that have a greater value to their right.
+
+1. **Reverse the List:** Apply the reversal technique from Problem 206 to reverse the entire list.
+
+2. **Remove Nodes:** Traverse the reversed list from left to right (which is right to left in the original):
+
+   - Track the maximum value seen so far
+   - If a node's value is less than the current maximum, remove it (it has a greater value to its right in the original)
+   - Otherwise, update the maximum and keep the node
+
+3. **Reverse Again:** Reverse the list back to restore the original order.
+
+4. **Why This Works:** After reversal, processing from left to right is equivalent to processing the original list from right to left. This makes it easy to identify nodes with greater values to their right.
+
+5. **Time Complexity:** O(N) - we traverse the list multiple times.
+6. **Space Complexity:** O(1) - only pointers are used.
+
+This problem demonstrates using **reversal to change traversal direction** for easier problem solving.
+
 **Code:**
 
 ```python
@@ -553,6 +700,24 @@ Output: []
 
 **Logic:**
 
+This problem uses a two-pointer technique with a dummy head to filter out nodes with a specific value. The slow pointer tracks the last valid node, while the fast pointer scans for nodes to keep.
+
+1. **Dummy Head Setup:** Create a dummy head to simplify edge cases, especially when the head needs to be removed.
+
+2. **Two-Pointer Filtering:**
+
+   - `slow`: points to the last node we've kept
+   - `fast`: scans through the list
+   - If `fast.val == val`, skip it by connecting `slow.next` to `fast.next`
+   - Otherwise, move `slow` forward
+
+3. **Why This Works:** By maintaining `slow` as the last valid node, we can easily skip unwanted nodes by updating `slow.next`. The dummy head ensures we always have a valid `slow` pointer.
+
+4. **Time Complexity:** O(N) - we traverse the list once.
+5. **Space Complexity:** O(1) - only a few pointers are used.
+
+This problem demonstrates **two-pointer filtering** for removing specific values from a linked list.
+
 **Code:**
 
 ```python
@@ -599,6 +764,25 @@ Output: [2,3]
 ### Solution
 
 **Logic:**
+
+This problem extends the filtering pattern from Problem 203. Instead of removing a single value, we remove all nodes that have duplicates, keeping only nodes with unique values.
+
+1. **Dummy Head Setup:** Use a dummy head to handle cases where the head needs to be removed.
+
+2. **Two-Pointer Approach:**
+
+   - `slow`: points to the last node we've kept
+   - `fast`: scans through the list
+   - When `fast.val == fast.next.val`, we've found duplicates
+   - Skip all nodes with this value by moving `fast` until a different value is found
+   - Connect `slow.next` to the new `fast` position (skipping all duplicates)
+
+3. **Why This Works:** Since the list is sorted, duplicates are adjacent. When we find `fast.val == fast.next.val`, we can skip all consecutive nodes with this value, then connect `slow.next` to the next unique value.
+
+4. **Time Complexity:** O(N) - we traverse the list once.
+5. **Space Complexity:** O(1) - only pointers are used.
+
+This problem demonstrates **removing all duplicates** (not just one occurrence) using the two-pointer filtering pattern.
 
 **Code:**
 
@@ -649,6 +833,26 @@ Output: [1,2]
 ### Solution
 
 **Logic:**
+
+This problem uses a two-list approach to partition nodes based on a value. We create two separate lists (small and big), then concatenate them.
+
+1. **Two-List Setup:** Create dummy heads for both "small" (values < x) and "big" (values >= x) lists, along with tail pointers for efficient appending.
+
+2. **Partitioning:** Traverse the original list:
+
+   - For each node, detach it from the list (`curr.next = None`)
+   - If `curr.val < x`, append to the small list
+   - Otherwise, append to the big list
+   - Update the respective tail pointer
+
+3. **Concatenation:** After processing all nodes, connect the small list's tail to the big list's head.
+
+4. **Why This Works:** By maintaining separate lists and their tails, we can efficiently partition while preserving relative order. The dummy heads simplify edge cases.
+
+5. **Time Complexity:** O(N) - we traverse the list once.
+6. **Space Complexity:** O(1) - only pointers are used, no new nodes created.
+
+This problem demonstrates **partitioning using two separate lists** to maintain relative order.
 
 **Code:**
 
@@ -705,6 +909,25 @@ Output: [2,3,6,7,1,5,4]
 
 **Logic:**
 
+This problem uses the same two-list partitioning approach as Problem 86, but partitions based on index parity (odd vs even) rather than value comparison.
+
+1. **Two-List Setup:** Create dummy heads for odd-indexed and even-indexed lists, with tail pointers for efficient appending.
+
+2. **Alternating Partition:** Traverse the list, alternating between odd and even:
+
+   - Use a boolean flag `odd` to track which list to append to
+   - Detach each node and append to the appropriate list
+   - Toggle the flag after each append
+
+3. **Concatenation:** Connect the odd list's tail to the even list's head.
+
+4. **Why This Works:** By maintaining separate lists and alternating appends, we preserve the relative order within each group while separating by index parity.
+
+5. **Time Complexity:** O(N) - we traverse the list once.
+6. **Space Complexity:** O(1) - only pointers are used.
+
+This problem demonstrates **partitioning by index pattern** using the same two-list technique as Problem 86.
+
 **Code:**
 
 ```python
@@ -759,6 +982,25 @@ Output: [7,9,6,6,8,7,3,0,9,5]
 ### Solution
 
 **Logic:**
+
+This problem uses two pointers with a fixed offset to find the kth node from the end (similar to Problem 19), then swaps values of the kth node from the beginning and the kth node from the end.
+
+1. **Find kth from Beginning:** Traverse `k-1` steps from head to reach the kth node (`left`).
+
+2. **Find kth from End:** Use two pointers with offset:
+
+   - Start `right` at head and `curr` at `left`
+   - Move both forward until `curr` reaches the end
+   - `right` will be at the kth node from the end
+
+3. **Swap Values:** Simply swap the values of `left` and `right` nodes.
+
+4. **Why This Works:** By maintaining a `k`-node gap between `right` and `curr`, when `curr` reaches the end, `right` is exactly `k` positions from the end.
+
+5. **Time Complexity:** O(N) - we traverse the list once.
+6. **Space Complexity:** O(1) - only pointers are used.
+
+This problem demonstrates **finding nodes by position** and swapping their values.
 
 **Code:**
 
@@ -824,6 +1066,23 @@ Output: [[3,null],[3,0],[3,null]]
 
 **Logic:**
 
+This problem requires creating a deep copy of a linked list with random pointers. The key is to use a hash map to maintain the mapping between original and copied nodes.
+
+1. **First Pass - Create Nodes:** Traverse the original list and create a copy of each node, storing the mapping `{original_node: copy_node}` in a hash map. Include `None` in the map to handle null pointers.
+
+2. **Second Pass - Set Pointers:** Traverse the original list again:
+
+   - For each original node, get its copy from the map
+   - Set `copy.next = copy_map[original.next]` (using the map to get the copied next node)
+   - Set `copy.random = copy_map[original.random]` (using the map to get the copied random node)
+
+3. **Why This Works:** The hash map ensures that when we set pointers in the second pass, we can always find the corresponding copied node, even if it was created earlier.
+
+4. **Time Complexity:** O(N) - we traverse the list twice.
+5. **Space Complexity:** O(N) - the hash map stores all nodes.
+
+This problem demonstrates **deep copying with pointer relationships** using a hash map for node mapping.
+
 **Code:**
 
 ```python
@@ -884,6 +1143,25 @@ Output: [8,9,9,9,0,0,0,1]
 ### Solution
 
 **Logic:**
+
+This is the foundational problem for adding numbers represented as linked lists. Since digits are stored in reverse order (least significant first), we can add them naturally from left to right.
+
+1. **Dummy Head Setup:** Create a dummy head to simplify result construction.
+
+2. **Addition Process:** Traverse both lists simultaneously:
+
+   - Extract values from both lists (0 if a list is exhausted)
+   - Calculate `sum = val1 + val2 + carry`
+   - Create a new node with value `sum % 10`
+   - Update `carry = sum // 10`
+   - Continue until both lists are exhausted and carry is 0
+
+3. **Why This Works:** Since digits are in reverse order, we process them from least to most significant, which matches how we perform addition. The carry propagates naturally.
+
+4. **Time Complexity:** O(max(M, N)) where M and N are the lengths of the lists.
+5. **Space Complexity:** O(max(M, N)) for the result list.
+
+This problem establishes the **standard linked list addition algorithm** that Problem 445 builds upon with reversal.
 
 **Code:**
 
