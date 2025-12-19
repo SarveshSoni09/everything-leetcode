@@ -414,3 +414,58 @@ class Solution:
 
         return ''.join(res)
 ```
+
+## Problem: 767. Reorganize the String
+
+Given a string `s`, rearrange the characters of `s` so that any two adjacent characters are not the same.
+
+Return any possible rearrangement of `s` or return `""` if not possible.
+
+### Example 1
+
+```
+Input: s = "aab"
+Output: "aba"
+```
+
+### Example 2
+
+```
+Input: s = "aaab"
+Output: ""
+```
+
+### Constraints
+
+- `1 <= s.length <= 500`
+- `s` consists of lowercase English letters.
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+import heapq
+class Solution:
+    def reorganizeString(self, s: str) -> str:
+        char_freq = Counter(s)
+        max_heap = [(-count, char) for char, count in char_freq.items()]
+        heapq.heapify(max_heap)
+        res = []
+        while max_heap:
+            count, char = heapq.heappop(max_heap)
+            if res and res[-1] == char:
+                if max_heap:
+                    ncount, nchar = count, char
+                    count, char = heapq.heappop(max_heap)
+                    heapq.heappush(max_heap, (ncount, nchar))
+                else:
+                    return ""
+            res.append(char)
+            count += 1
+            if count:
+                heapq.heappush(max_heap, (count, char))
+        return ''.join(res)
+```
