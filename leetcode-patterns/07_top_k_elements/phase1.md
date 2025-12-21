@@ -567,3 +567,96 @@ class Solution:
                     return False
         return True
 ```
+
+## Problem: 23. Merge k Sorted Lists
+
+You are given an array of `k` linked-lists `lists`, each linked-list is sorted in ascending order.
+
+Merge all the linked-lists into one sorted linked-list and return it.
+
+### Example 1
+
+```
+Input: lists = [[1,4,5],[1,3,4],[2,6]]
+Output: [1,1,2,3,4,4,5,6]
+Explanation: The linked-lists are:
+[
+  1->4->5,
+  1->3->4,
+  2->6
+]
+merging them into one sorted linked list:
+1->1->2->3->4->4->5->6
+```
+
+### Example 2
+
+```
+Input: lists = []
+Output: []
+```
+
+### Example 3
+
+```
+Input: lists = [[]]
+Output: []
+```
+
+### Constraints
+
+- `k == lists.length`
+- `0 <= k <= 10^4`
+- `0 <= lists[i].length <= 500`
+- `-10^4 <= lists[i][j] <= 10^4`
+- `lists[i]` is sorted in ascending order.
+- The sum of `lists[i].length` will not exceed `10^4`
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+The following solution has a time complexity of $O(N\log N)$ and space complexity of $O(N)$.  
+This can be optimized down to $O(N\log k)$ time complexity and $O(k)$ memory.
+
+```python
+import heapq
+class Solution:
+    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+        heap = []
+        for ll in lists:
+            while ll:
+                heapq.heappush(heap, ll.val)
+                ll = ll.next
+        head = ListNode(0)
+        curr = head
+        while heap:
+            curr.next = ListNode(heapq.heappop(heap))
+            curr = curr.next
+        return head.next
+```
+
+In the above code, we pushed every single element into the heap and thus the memory is $O(N)$.  
+The time complexity can be dropped if we limited the size of the heap to just $k$ elements (one active node per list) instead of loading all $N$ elements at once.  
+Since the cost of a heap operation depends on the heap's size, paying $O(\log k)$ for each of the $N$ steps is significantly cheaper than paying $O(\log N)$
+
+```python
+import heapq
+class Solution:
+    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+        min_heap = []
+        for i, l in enumerate(lists):
+            if l:
+                heapq.heappush(min_heap, (l.val, i, l))
+        head = ListNode(0)
+        curr = head
+        while min_heap:
+            val, i, node = heapq.heappop(min_heap)
+            curr.next = node
+            curr = curr.next
+            if node.next:
+                heapq.heappush(min_heap, (node.next.val, i, node.next))
+        return head.next
+```
