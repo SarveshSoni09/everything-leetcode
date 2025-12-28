@@ -205,6 +205,86 @@ class Solution:
         return res
 ```
 
+## Problem: 378. Kth Smallest Element in a Sorted Matrix
+
+Given an `n x n` `matrix` where each of the rows and columns is sorted in ascending order, return the `kth` smallest element in the matrix.
+
+Note that it is the `kth` smallest element in the sorted order, not the `kth` distinct element.
+
+You must find a solution with a memory complexity better than `O(n2)`
+
+### Example 1
+
+```
+Input: matrix = [[1,5,9],[10,11,13],[12,13,15]], k = 8
+Output: 13
+Explanation: The elements in the matrix are [1,5,9,10,11,12,13,13,15], and the 8th smallest number is 13
+```
+
+### Example 2
+
+```
+Input: matrix = [[-5]], k = 1
+Output: -5
+```
+
+### Constraints
+
+- `n == matrix.length == matrix[i].length`
+- `1 <= n <= 300`
+- `-10^9 <= matrix[i][j] <= 10^9`
+- All the rows and columns of matrix are guaranteed to be sorted in non-decreasing order.
+- `1 <= k <= n^2`
+
+Follow up:
+
+Could you solve the problem with a constant memory (i.e., O(1) memory complexity)?
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+Brute force Solution
+
+```python
+import heapq
+class Solution:
+    def kthSmallest(self, matrix: List[List[int]], k: int) -> int:
+        n = len(matrix)
+        if n == 1:
+            return matrix[0][0]
+        max_heap = []
+        for r in range(n):
+            for c in range(n):
+                if len(max_heap) < k:
+                    heapq.heappush(max_heap, -matrix[r][c])
+                else:
+                    if -matrix[r][c] > max_heap[0]:
+                        heapq.heappushpop(max_heap, -matrix[r][c])
+                    else:
+                        break
+        return -max_heap[0]
+```
+
+Optimized Solution
+
+```python
+import heapq
+class Solution:
+    def kthSmallest(self, matrix: List[List[int]], k: int) -> int:
+        n = len(matrix)
+        min_heap = []
+        for r in range(min(n, k)):
+            heapq.heappush(min_heap, [matrix[r][0], r, 0])
+        for _ in range(k-1):
+            val, r, c = heapq.heappop(min_heap)
+            if c + 1 < n:
+                heapq.heappush(min_heap, [matrix[r][c+1], r, c+1])
+        return min_heap[0][0]
+```
+
 ## Problem: 692. Top K Frequent Words
 
 Given an array of strings words and an integer k, return the k most frequent strings.
@@ -738,7 +818,150 @@ class Solution:
         return res
 ```
 
-## Problem: 1705. Maximum Number o Eaten Apples
+## Problem: 355. Design Twitter
+
+Design a simplified version of Twitter where users can post tweets, follow/unfollow another user, and is able to see the `10` most recent tweets in the user's news feed.
+
+Implement the `Twitter` class:
+
+- `Twitter()` Initializes your twitter object.
+- `void postTweet(int userId, int tweetId)` Composes a new tweet with ID `tweetId` by the user `userId`. Each call to this function will be made with a unique `tweetId`.
+- `List<Integer> getNewsFeed(int userId)` Retrieves the `10` most recent tweet IDs in the user's news feed. Each item in the news feed must be posted by users who the user followed or by the user themself. Tweets must be ordered from most recent to least recent.
+- `void follow(int followerId, int followeeId)` The user with ID `followerId` started following the user with ID `followeeId`.
+- `void unfollow(int followerId, int followeeId)` The user with ID `followerId` started unfollowing the user with ID `followeeId`.
+
+### Example 1
+
+```
+Input
+["Twitter", "postTweet", "getNewsFeed", "follow", "postTweet", "getNewsFeed", "unfollow", "getNewsFeed"]
+[[], [1, 5], [1], [1, 2], [2, 6], [1], [1, 2], [1]]
+Output
+[null, null, [5], null, null, [6, 5], null, [5]]
+
+Explanation
+Twitter twitter = new Twitter();
+twitter.postTweet(1, 5); // User 1 posts a new tweet (id = 5).
+twitter.getNewsFeed(1);  // User 1's news feed should return a list with 1 tweet id -> [5]. return [5]
+twitter.follow(1, 2);    // User 1 follows user 2.
+twitter.postTweet(2, 6); // User 2 posts a new tweet (id = 6).
+twitter.getNewsFeed(1);  // User 1's news feed should return a list with 2 tweet ids -> [6, 5]. Tweet id 6 should precede tweet id 5 because it is posted after tweet id 5.
+twitter.unfollow(1, 2);  // User 1 unfollows user 2.
+twitter.getNewsFeed(1);  // User 1's news feed should return a list with 1 tweet id -> [5], since user 1 is no longer following user 2.
+```
+
+### Constraints
+
+- `1 <= userId, followerId, followeeId <= 500`
+- `0 <= tweetId <= 10^4`
+- All the tweets have unique IDs.
+- At most `3 * 10^4` calls will be made to `postTweet`, `getNewsFeed`, `follow`, and `unfollow`.
+- A user cannot follow himself.
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Twitter:
+
+    def __init__(self):
+        self.order = 0
+        self.tweetMap = defaultdict(list)
+        self.followMap = defaultdict(set)
+
+    def postTweet(self, userId: int, tweetId: int) -> None:
+        self.tweetMap[userId].append([self.order, tweetId])
+        self.order -= 1
+
+    def getNewsFeed(self, userId: int) -> List[int]:
+        res = []
+        minHeap = []
+
+        self.followMap[userId].add(userId)
+        for followeeId in self.followMap[userId]:
+            if followeeId in self.tweetMap:
+                index = len(self.tweetMap[followeeId]) - 1
+                count, tweetId = self.tweetMap[followeeId][index]
+                minHeap.append([count, tweetId, followeeId, index - 1])
+        heapq.heapify(minHeap)
+        while minHeap and len(res) < 10:
+            count, tweetId, followeeId, index = heapq.heappop(minHeap)
+            res.append(tweetId)
+            if index >= 0:
+                count, tweetId = self.tweetMap[followeeId][index]
+                heapq.heappush(minHeap, [count, tweetId, followeeId, index - 1])
+        return res
+
+    def follow(self, followerId: int, followeeId: int) -> None:
+        self.followMap[followerId].add(followeeId)
+
+    def unfollow(self, followerId: int, followeeId: int) -> None:
+        if followeeId in self.followMap[followerId]:
+            self.followMap[followerId].remove(followeeId)
+```
+
+## Problem: 1094. Car Pooling
+
+There is a car with `capacity` empty seats. The vehicle only drives east (i.e., it cannot turn around and drive west).
+
+You are given the integer `capacity` and an array `trips` where `trips[i] = [numPassengersi, fromi, toi]` indicates that the `ith` trip has `numPassengersi` passengers and the locations to pick them up and drop them off are `fromi` and `toi` respectively. The locations are given as the number of kilometers due east from the car's initial location.
+
+Return `true` if it is possible to pick up and drop off all passengers for all the given trips, or `false` otherwise.
+
+### Example 1
+
+```
+Input: trips = [[2,1,5],[3,3,7]], capacity = 4
+Output: false
+```
+
+### Example 2
+
+```
+Input: trips = [[2,1,5],[3,3,7]], capacity = 5
+Output: true
+```
+
+### Constraints
+
+- `1 <= trips.length <= 1000`
+- `trips[i].length == 3`
+- `1 <= numPassengersi <= 100`
+- `0 <= fromi < toi <= 1000`
+- `1 <= capacity <= 105`
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+import heapq
+class Solution:
+    def carPooling(self, trips: List[List[int]], capacity: int) -> bool:
+        start_heap = []
+        end_heap = []
+        cap_avail = capacity
+        for px, start, end in trips:
+            heapq.heappush(start_heap, [start, end, px])
+            heapq.heappush(end_heap, [end, px])
+        while start_heap:
+            start, end, px = heapq.heappop(start_heap)
+            cap_avail -= px
+            if cap_avail < 0:
+                while end_heap and end_heap[0][0] <= start:
+                    e, cap = heapq.heappop(end_heap)
+                    cap_avail += cap
+                if cap_avail < 0:
+                    return False
+        return True
+```
+
+## Problem: 1705. Maximum Number of Eaten Apples
 
 There is a special kind of apple tree that grows apples every day for `n` days. On the `ith` day, the tree grows `apples[i]` apples that will rot after `days[i]` days, that is on day `i + days[i]` the apples will be rotten and cannot be eaten. On some days, the apple tree does not grow any apples, which are denoted by `apples[i] == 0` and `days[i] == 0`.
 
@@ -848,62 +1071,4 @@ class Solution:
                     heapq.heappop(heap)
             i += 1
         return res
-```
-
-## Problem: 1094. Car Pooling
-
-There is a car with `capacity` empty seats. The vehicle only drives east (i.e., it cannot turn around and drive west).
-
-You are given the integer `capacity` and an array `trips` where `trips[i] = [numPassengersi, fromi, toi]` indicates that the `ith` trip has `numPassengersi` passengers and the locations to pick them up and drop them off are `fromi` and `toi` respectively. The locations are given as the number of kilometers due east from the car's initial location.
-
-Return `true` if it is possible to pick up and drop off all passengers for all the given trips, or `false` otherwise.
-
-### Example 1
-
-```
-Input: trips = [[2,1,5],[3,3,7]], capacity = 4
-Output: false
-```
-
-### Example 2
-
-```
-Input: trips = [[2,1,5],[3,3,7]], capacity = 5
-Output: true
-```
-
-### Constraints
-
-- `1 <= trips.length <= 1000`
-- `trips[i].length == 3`
-- `1 <= numPassengersi <= 100`
-- `0 <= fromi < toi <= 1000`
-- `1 <= capacity <= 105`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-import heapq
-class Solution:
-    def carPooling(self, trips: List[List[int]], capacity: int) -> bool:
-        start_heap = []
-        end_heap = []
-        cap_avail = capacity
-        for px, start, end in trips:
-            heapq.heappush(start_heap, [start, end, px])
-            heapq.heappush(end_heap, [end, px])
-        while start_heap:
-            start, end, px = heapq.heappop(start_heap)
-            cap_avail -= px
-            if cap_avail < 0:
-                while end_heap and end_heap[0][0] <= start:
-                    e, cap = heapq.heappop(end_heap)
-                    cap_avail += cap
-                if cap_avail < 0:
-                    return False
-        return True
 ```
