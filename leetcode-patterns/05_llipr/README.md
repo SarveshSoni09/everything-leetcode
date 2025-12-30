@@ -49,4 +49,3 @@ This phase (6 problems) demonstrates using reversal as a problem-solving tool ra
      - **Reasoning:** The foundational problem for adding numbers represented as linked lists. Since digits are stored in reverse order (least significant first), we can add naturally from left to right. Establishes the standard addition algorithm with carry propagation. Problem 445 builds upon this by using reversal to handle the most-significant-first format.
 
 Together, these three phases take you from basic three-pointer reversal to sophisticated list manipulation, showing how reversal can be both a technique and a problem-solving tool, while also covering essential patterns like filtering, partitioning, and deep copying.
-
