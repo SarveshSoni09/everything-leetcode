@@ -169,38 +169,48 @@ class Solution:
         return res
 ```
 
-## Problem: 986. Interval List Intersections
+## Problem: 1109. Corporate Flight Bookings
 
-You are given two lists of closed intervals, `firstList` and `secondList`, where `firstList[i] = [starti, endi]` and `secondList[j] = [startj, endj]`. Each list of intervals is pairwise disjoint and in sorted order.
+There are `n` flights that are labeled from `1` to `n`.
 
-Return the intersection of these two interval lists.
+You are given an array of flight bookings `bookings`, where `bookings[i] = [firsti, lasti, seatsi]` represents a booking for flights `firsti` through `lasti` (inclusive) with `seatsi` seats reserved for each flight in the range.
 
-A closed interval `[a, b]` (with `a <= b`) denotes the set of real numbers `x` with `a <= x <= b`.
-
-The intersection of two closed intervals is a set of real numbers that are either empty or represented as a closed interval. For example, the intersection of `[1, 3]` and `[2, 4]` is `[2, 3]`.
+Return an array `answer` of length `n`, where `answer[i]` is the total number of seats reserved for flight `i`.
 
 ### Example 1
 
 ```
-Input: firstList = [[0,2],[5,10],[13,23],[24,25]], secondList = [[1,5],[8,12],[15,24],[25,26]]
-Output: [[1,2],[5,5],[8,10],[15,23],[24,24],[25,25]]
+Input: bookings = [[1,2,10],[2,3,20],[2,5,25]], n = 5
+Output: [10,55,45,25,25]
+Explanation:
+Flight labels:        1   2   3   4   5
+Booking 1 reserved:  10  10
+Booking 2 reserved:      20  20
+Booking 3 reserved:      25  25  25  25
+Total seats:         10  55  45  25  25
+Hence, answer = [10,55,45,25,25]
 ```
 
 ### Example 2
 
 ```
-Input: firstList = [[1,3],[5,9]], secondList = []
-Output: []
+Input: bookings = [[1,2,10],[2,2,15]], n = 2
+Output: [10,25]
+Explanation:
+Flight labels:        1   2
+Booking 1 reserved:  10  10
+Booking 2 reserved:      15
+Total seats:         10  25
+Hence, answer = [10,25]
 ```
 
 ### Constraints
 
-- `0 <= firstList.length, secondList.length <= 1000`
-- `firstList.length + secondList.length >= 1`
-- `0 <= starti < endi <= 10^9`
-- `endi < starti+1`
-- `0 <= startj < endj <= 10^9`
-- `endj < startj+1`
+- `1 <= n <= 2 * 10^4`
+- `1 <= bookings.length <= 2 * 10^4`
+- `bookings[i].length == 3`
+- `1 <= firsti <= lasti <= n`
+- `1 <= seatsi <= 10^4`
 
 ### Solution
 
@@ -210,75 +220,13 @@ Output: []
 
 ```python
 class Solution:
-    def intervalIntersection(self, firstList: List[List[int]], secondList: List[List[int]]) -> List[List[int]]:
-        m, n = len(firstList), len(secondList)
-        i, j = 0, 0
-        res = []
-        while i < m and j < n:
-            start = max(firstList[i][0], secondList[j][0])
-            end = min(firstList[i][1], secondList[j][1])
-            if start <= end:
-                res.append([start, end])
-            if secondList[j][1] < firstList[i][1]:
-                j += 1
-            else:
-                i += 1
-        return res
-```
+    def corpFlightBookings(self, bookings: List[List[int]], n: int) -> List[int]:
+        result = [0] * (n + 1)
+        for start, end, seats in bookings:
+            result[start - 1] += seats
+            result[end] -= seats
 
-## Problem: 986. Interval List Intersections
-
-You are given two lists of closed intervals, `firstList` and `secondList`, where `firstList[i] = [starti, endi]` and `secondList[j] = [startj, endj]`. Each list of intervals is pairwise disjoint and in sorted order.
-
-Return the intersection of these two interval lists.
-
-A closed interval `[a, b]` (with `a <= b`) denotes the set of real numbers `x` with `a <= x <= b`.
-
-The intersection of two closed intervals is a set of real numbers that are either empty or represented as a closed interval. For example, the intersection of `[1, 3]` and `[2, 4]` is `[2, 3]`.
-
-### Example 1
-
-```
-Input: firstList = [[0,2],[5,10],[13,23],[24,25]], secondList = [[1,5],[8,12],[15,24],[25,26]]
-Output: [[1,2],[5,5],[8,10],[15,23],[24,24],[25,25]]
-```
-
-### Example 2
-
-```
-Input: firstList = [[1,3],[5,9]], secondList = []
-Output: []
-```
-
-### Constraints
-
-- `0 <= firstList.length, secondList.length <= 1000`
-- `firstList.length + secondList.length >= 1`
-- `0 <= starti < endi <= 10^9`
-- `endi < starti+1`
-- `0 <= startj < endj <= 10^9`
-- `endj < startj+1`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def intervalIntersection(self, firstList: List[List[int]], secondList: List[List[int]]) -> List[List[int]]:
-        m, n = len(firstList), len(secondList)
-        i, j = 0, 0
-        res = []
-        while i < m and j < n:
-            start = max(firstList[i][0], secondList[j][0])
-            end = min(firstList[i][1], secondList[j][1])
-            if start <= end:
-                res.append([start, end])
-            if secondList[j][1] < firstList[i][1]:
-                j += 1
-            else:
-                i += 1
-        return res
+        for i in range(1, n):
+            result[i] += result[i - 1]
+        return result[:-1]
 ```
