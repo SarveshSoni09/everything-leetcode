@@ -231,48 +231,41 @@ class Solution:
         return result[:-1]
 ```
 
-## Problem: 1109. Corporate Flight Bookings
+## Problem: 435. Non-overlapping Intervals
 
-There are `n` flights that are labeled from `1` to `n`.
+Given an array of intervals intervals where `intervals[i] = [starti, endi]`, return the minimum number of intervals you need to remove to make the rest of the intervals non-overlapping.
 
-You are given an array of flight bookings `bookings`, where `bookings[i] = [firsti, lasti, seatsi]` represents a booking for flights `firsti` through `lasti` (inclusive) with `seatsi` seats reserved for each flight in the range.
-
-Return an array `answer` of length `n`, where `answer[i]` is the total number of seats reserved for flight `i`.
+Note that intervals which only touch at a point are non-overlapping. For example, `[1, 2]` and `[2, 3]` are non-overlapping.
 
 ### Example 1
 
 ```
-Input: bookings = [[1,2,10],[2,3,20],[2,5,25]], n = 5
-Output: [10,55,45,25,25]
-Explanation:
-Flight labels:        1   2   3   4   5
-Booking 1 reserved:  10  10
-Booking 2 reserved:      20  20
-Booking 3 reserved:      25  25  25  25
-Total seats:         10  55  45  25  25
-Hence, answer = [10,55,45,25,25]
+Input: intervals = [[1,2],[2,3],[3,4],[1,3]]
+Output: 1
+Explanation: [1,3] can be removed and the rest of the intervals are non-overlapping.
 ```
 
 ### Example 2
 
 ```
-Input: bookings = [[1,2,10],[2,2,15]], n = 2
-Output: [10,25]
-Explanation:
-Flight labels:        1   2
-Booking 1 reserved:  10  10
-Booking 2 reserved:      15
-Total seats:         10  25
-Hence, answer = [10,25]
+Input: intervals = [[1,2],[1,2],[1,2]]
+Output: 2
+Explanation: You need to remove two [1,2] to make the rest of the intervals non-overlapping.
+```
+
+### Example 3
+
+```
+Input: intervals = [[1,2],[2,3]]
+Output: 0
+Explanation: You don't need to remove any of the intervals since they're already non-overlapping.
 ```
 
 ### Constraints
 
-- `1 <= n <= 2 * 10^4`
-- `1 <= bookings.length <= 2 * 10^4`
-- `bookings[i].length == 3`
-- `1 <= firsti <= lasti <= n`
-- `1 <= seatsi <= 10^4`
+- `1 <= intervals.length <= 10^5`
+- `intervals[i].length == 2`
+- `-5 * 104 <= starti < endi <= 5 * 10^4`
 
 ### Solution
 
@@ -282,75 +275,30 @@ Hence, answer = [10,25]
 
 ```python
 class Solution:
-    def corpFlightBookings(self, bookings: List[List[int]], n: int) -> List[int]:
-        result = [0] * (n + 1)
-        for start, end, seats in bookings:
-            result[start - 1] += seats
-            result[end] -= seats
-
-        for i in range(1, n):
-            result[i] += result[i - 1]
-        return result[:-1]
+    def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:
+        intervals.sort()
+        res = 0
+        prev_end = intervals[0][1]
+        for start, end in intervals[1:]:
+            if start >= prev_end:
+                prev_end = end
+            else:
+                res += 1
+                prev_end = min(prev_end, end)
+        return res
 ```
 
-## Problem: 1109. Corporate Flight Bookings
-
-There are `n` flights that are labeled from `1` to `n`.
-
-You are given an array of flight bookings `bookings`, where `bookings[i] = [firsti, lasti, seatsi]` represents a booking for flights `firsti` through `lasti` (inclusive) with `seatsi` seats reserved for each flight in the range.
-
-Return an array `answer` of length `n`, where `answer[i]` is the total number of seats reserved for flight `i`.
-
-### Example 1
-
-```
-Input: bookings = [[1,2,10],[2,3,20],[2,5,25]], n = 5
-Output: [10,55,45,25,25]
-Explanation:
-Flight labels:        1   2   3   4   5
-Booking 1 reserved:  10  10
-Booking 2 reserved:      20  20
-Booking 3 reserved:      25  25  25  25
-Total seats:         10  55  45  25  25
-Hence, answer = [10,55,45,25,25]
-```
-
-### Example 2
-
-```
-Input: bookings = [[1,2,10],[2,2,15]], n = 2
-Output: [10,25]
-Explanation:
-Flight labels:        1   2
-Booking 1 reserved:  10  10
-Booking 2 reserved:      15
-Total seats:         10  25
-Hence, answer = [10,25]
-```
-
-### Constraints
-
-- `1 <= n <= 2 * 10^4`
-- `1 <= bookings.length <= 2 * 10^4`
-- `bookings[i].length == 3`
-- `1 <= firsti <= lasti <= n`
-- `1 <= seatsi <= 10^4`
-
-### Solution
-
-**Logic:**
-
-**Code:**
+More optimized Solution
 
 ```python
 class Solution:
-    def corpFlightBookings(self, bookings: List[List[int]], n: int) -> List[int]:
-        result = [0] * (n + 1)
-        for start, end, seats in bookings:
-            result[start - 1] += seats
-            result[end] -= seats
-
-        for i in range(1, n):
-            result[i] += result[i - 1]
-        return result[:-1]
+    def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:
+        intervals.sort(key = lambda x: x[1])
+        res = 1
+        prev_end = intervals[0][1]
+        for start, end in intervals[1:]:
+            if start >= prev_end:
+                res += 1
+                prev_end = end
+        return len(intervals) - res
 ```
