@@ -431,3 +431,59 @@ class Solution:
                 prev_right = right
         return chain
 ```
+
+## Problem: 763. Partition Labels
+
+You are given a string `s`. We want to partition the string into as many parts as possible so that each letter appears in at most one part. For example, the string `"ababcc"` can be partitioned into `["abab", "cc"]`, but partitions such as `["aba", "bcc"]` or `["ab", "ab", "cc"]` are invalid.
+
+Note that the partition is done so that after concatenating all the parts in order, the resultant string should be `s`.
+
+Return a list of integers representing the size of these parts.
+
+### Example 1
+
+```
+Input: s = "ababcbacadefegdehijhklij"
+Output: [9,7,8]
+Explanation:
+The partition is "ababcbaca", "defegde", "hijhklij".
+This is a partition so that each letter appears in at most one part.
+A partition like "ababcbacadefegde", "hijhklij" is incorrect, because it splits s into less parts.
+```
+
+### Example 2
+
+```
+Input: s = "eccbbbbdec"
+Output: [10]
+```
+
+### Constraints
+
+- `1 <= s.length <= 500`
+- `s` consists of lowercase English letters.
+
+### Solution
+
+**Logic:**
+
+**Code:**
+
+```python
+class Solution:
+    def partitionLabels(self, s: str) -> List[int]:
+        h_map = {}
+        for i, c in enumerate(s):
+            h_map[c] = i
+        end = h_map[s[0]]
+        size = 0
+        res = []
+        for i, c in enumerate(s):
+            if i > end:
+                res.append(size)
+                size = 0
+            size += 1
+            end = max(end, h_map[c])
+        res.append(size)
+        return res
+```
