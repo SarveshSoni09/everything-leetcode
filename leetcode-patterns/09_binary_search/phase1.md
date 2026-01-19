@@ -225,37 +225,44 @@ class Solution:
         return False
 ```
 
-## Problem: 74. Search 2D Matrix
+## Problem: 33. Search in Rotated Sorted Array
 
-You are given an `m x n` integer matrix `matrix` with the following two properties:
+There is an integer array `nums` sorted in ascending order (with distinct values).
 
-- Each row is sorted in non-decreasing order.
-- The first integer of each row is greater than the last integer of the previous row.
+Prior to being passed to your function, `nums` is possibly left rotated at an unknown index `k (1 <= k < nums.length)` such that the resulting array is `[nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]` (0-indexed). For example, `[0,1,2,4,5,6,7]` might be left rotated by `3` indices and become `[4,5,6,7,0,1,2]`.
 
-Given an integer `target`, return `true` if `target` is in `matrix` or `false` otherwise.
+Given the array `nums` after the possible rotation and an integer `target`, return the index of `target` if it is in `nums`, or `-1` if it is not in `nums`.
 
-You must write a solution in `O(log(m * n))` time complexity.
+You must write an algorithm with `O(log n)` runtime complexity.
 
 ### Example 1
 
 ```
-Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 3
-Output: true
+Input: nums = [4,5,6,7,0,1,2], target = 0
+Output: 4
 ```
 
 ### Example 2
 
 ```
-Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 13
-Output: false
+Input: nums = [4,5,6,7,0,1,2], target = 3
+Output: -1
+```
+
+### Example 3
+
+```
+Input: nums = [1], target = 0
+Output: -1
 ```
 
 ### Constraints
 
-- `m == matrix.length`
-- `n == matrix[i].length`
-- `1 <= m, n <= 100`
-- `-10^4 <= matrix[i][j], target <= 10^4`
+- `1 <= nums.length <= 5000`
+- `-10^4 <= nums[i] <= 10^4`
+- All values of `nums` are unique.
+- `nums` is an ascending array that is possibly rotated.
+- `-10^4 <= target <= 10^4`
 
 ### Solution
 
@@ -265,130 +272,21 @@ Output: false
 
 ```python
 class Solution:
-    def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
-        m, n = len(matrix), len(matrix[0])
-        l, r = 0, (m * n) - 1
+    def search(self, nums: List[int], target: int) -> int:
+        l, r = 0, len(nums) - 1
         while l <= r:
             mid = (l + r) // 2
-            row = mid // n
-            col = mid % n
-            if matrix[row][col] == target:
-                return True
-            elif matrix[row][col] > target:
-                r = mid - 1
+            if nums[mid] == target:
+                return mid
+            if nums[l] <= nums[mid]:
+                if target > nums[mid] or target < nums[l]:
+                    l = mid + 1
+                else:
+                    r = mid - 1
             else:
-                l = mid + 1
-        return False
-```
-
-## Problem: 74. Search 2D Matrix
-
-You are given an `m x n` integer matrix `matrix` with the following two properties:
-
-- Each row is sorted in non-decreasing order.
-- The first integer of each row is greater than the last integer of the previous row.
-
-Given an integer `target`, return `true` if `target` is in `matrix` or `false` otherwise.
-
-You must write a solution in `O(log(m * n))` time complexity.
-
-### Example 1
-
-```
-Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 3
-Output: true
-```
-
-### Example 2
-
-```
-Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 13
-Output: false
-```
-
-### Constraints
-
-- `m == matrix.length`
-- `n == matrix[i].length`
-- `1 <= m, n <= 100`
-- `-10^4 <= matrix[i][j], target <= 10^4`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
-        m, n = len(matrix), len(matrix[0])
-        l, r = 0, (m * n) - 1
-        while l <= r:
-            mid = (l + r) // 2
-            row = mid // n
-            col = mid % n
-            if matrix[row][col] == target:
-                return True
-            elif matrix[row][col] > target:
-                r = mid - 1
-            else:
-                l = mid + 1
-        return False
-```
-
-## Problem: 74. Search 2D Matrix
-
-You are given an `m x n` integer matrix `matrix` with the following two properties:
-
-- Each row is sorted in non-decreasing order.
-- The first integer of each row is greater than the last integer of the previous row.
-
-Given an integer `target`, return `true` if `target` is in `matrix` or `false` otherwise.
-
-You must write a solution in `O(log(m * n))` time complexity.
-
-### Example 1
-
-```
-Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 3
-Output: true
-```
-
-### Example 2
-
-```
-Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 13
-Output: false
-```
-
-### Constraints
-
-- `m == matrix.length`
-- `n == matrix[i].length`
-- `1 <= m, n <= 100`
-- `-10^4 <= matrix[i][j], target <= 10^4`
-
-### Solution
-
-**Logic:**
-
-**Code:**
-
-```python
-class Solution:
-    def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
-        m, n = len(matrix), len(matrix[0])
-        l, r = 0, (m * n) - 1
-        while l <= r:
-            mid = (l + r) // 2
-            row = mid // n
-            col = mid % n
-            if matrix[row][col] == target:
-                return True
-            elif matrix[row][col] > target:
-                r = mid - 1
-            else:
-                l = mid + 1
-        return False
+                if target < nums[mid] or target > nums[r]:
+                    r = mid - 1
+                else:
+                    l = mid + 1
+        return -1
 ```
